@@ -150,7 +150,13 @@ function createEntry(mod, version) {
 function summaryOnClick(e) {
     if (!multiSelect) {
         // regular dropdown interaction
-        if (!e.ctrlKey) return;
+        if (!e.ctrlKey) {
+            if (window.getSelection) {
+                let selection = window.getSelection();
+                selection.removeAllRanges();
+            }
+            return
+        }
 
         // ctrl key pressed, turn on multiselect and check the element clicked on
         e.preventDefault()
