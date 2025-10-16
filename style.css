@@ -1,0 +1,137 @@
+a:not(.button) {
+    background: url("/images/external.svg") center right no-repeat;
+    padding-right: 14px;
+}
+
+a.external-pdf {
+    background: url("/images/pdf.png") center right no-repeat;
+    padding-right: 20px;
+}
+
+a.button {
+    background: none;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+details[open] summary {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+details summary::marker {
+    content: "";
+}
+
+:root {
+    --symbol: ">"
+}
+
+details summary::before {
+    content: var(--symbol);
+}
+
+details[open] summary::before {
+    content: "˅";
+}
+
+.options {
+    display: flex;
+    max-width: 600px;
+}
+
+.options>div {
+    width: calc(100% / 3);
+}
+
+.options input {
+    display: block;
+    margin: auto;
+}
+
+.options p {
+    text-align: center;
+}
+
+#category-div {
+    padding-left: 15%;
+}
+
+#os-div {
+    padding-left: 25%;
+}
+
+.mod-entry summary {
+    padding: 5px;
+}
+
+.mod-entry p {
+    /* yikes */
+    padding: 5px;
+    padding-left: 8px;
+    padding-bottom: 7px;
+    margin: 0
+}
+
+.mod-entry {
+    max-width: 600px;
+    border: 1px solid #f0f0f0;
+    border-bottom: 0;
+}
+
+.mod-entry:last-child {
+    border: 1px solid #f0f0f0;
+}
+
+.version-align {
+    float: right;
+}
+
+body {
+    font-family: Consolas, monaco, monospace;
+    background-color: black;
+    color: #f0f0f0;
+    max-width: 800px;
+}
+
+a {
+    color: #bb86fc;
+}
+
+#version {
+    background: inherit;
+    font: inherit;
+    border: 1px solid white;
+    color: inherit;
+    padding: 3px;
+    width: 130px;
+}
+
+/* 
+#version:active, #version:focus {
+    outline-style: solid;
+    outline-color: #bb86fc;
+}
+*/
+
+input:is([type="checkbox"], [type="radio"]) {
+    appearance: none;
+}
+
+input:is([type="checkbox"], [type="radio"])+label::before {
+    content: "[ ] ";
+    color: #bb86fc;
+}
+
+input:is([type="checkbox"], [type="radio"]):checked+label::before {
+    content: "[x] ";
+}
+
+.hidden {
+    display: none;
+}
+
+hr {
+    border: none;
+    margin-bottom: 2px;
+    margin-top:2px;
+}
