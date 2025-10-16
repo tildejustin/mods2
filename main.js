@@ -167,7 +167,11 @@ function summaryOnClick(e) {
         (e.target.tagName == "LABEL" ? e.target.parentElement : e.target)
             .querySelector("input");
     checkbox.checked = !checkbox.checked;
-    checkDownloadAllVisible()
+
+    if (checkboxes.every(it => !it.checked)) {
+        disableMultiSelect()
+    }
+
     /* file explorer behavior: kinda cool but regular people have to be able to use this site unfortunately
 
     // no ctrl -> don't preserve current selections
@@ -197,15 +201,6 @@ function summaryOnClick(e) {
     }
     */
 
-}
-
-// can't be bothered to make this efficient
-function checkDownloadAllVisible() {
-    if (checkboxes.some(it => it.checked)) {
-        document.querySelectorAll(".ms-show").forEach(it => it.classList.remove("hidden"))
-    } else {
-        document.querySelectorAll(".ms-show").forEach(it => it.classList.add("hidden"))
-    }
 }
 
 /**
@@ -250,7 +245,6 @@ document.addEventListener("DOMContentLoaded", () => {
         // unrecommended = (mod["recommended"] ?? true) || (version["recommended"] ?? true)
         // map id -> checkbox + helper function isRecommended(mod)
         checkboxes.forEach(it => it.checked = true)
-        checkDownloadAllVisible()
     })
 
     // call the click event listener for a tags with no href
@@ -274,6 +268,7 @@ function enableMultiSelect() {
     // I hate web development so much actually wtf is this behavior. it better be consistent.
     document.documentElement.style.setProperty("--symbol", "_")
     document.querySelectorAll(".ms-checkbox-label").forEach(it => it.classList.remove("hidden"))
+    document.querySelectorAll(".ms-show").forEach(it => it.classList.remove("hidden"))
     multiSelect = true
     // activeCheckbox = checkboxes[0]
 }
@@ -282,6 +277,7 @@ function disableMultiSelect() {
     checkboxes.forEach(it => it.checked = false)
     document.documentElement.style.removeProperty("--symbol")
     document.querySelectorAll(".ms-checkbox-label").forEach(it => it.classList.add("hidden"))
+    document.querySelectorAll(".ms-show").forEach(it => it.classList.add("hidden"))
     multiSelect = false
     // activeCheckbox = null
 }
