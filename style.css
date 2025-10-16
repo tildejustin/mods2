@@ -44,20 +44,7 @@ details[open] summary::before {
 }
 
 .options input {
-    display: block;
     margin: auto;
-}
-
-.options p {
-    text-align: center;
-}
-
-#category-div {
-    padding-left: 15%;
-}
-
-#os-div {
-    padding-left: 25%;
 }
 
 .mod-entry summary {
@@ -103,7 +90,9 @@ a {
     border: 1px solid white;
     color: inherit;
     padding: 3px;
-    width: 130px;
+    width: 95%;
+    max-width: 130px;
+    box-sizing: border-box;
 }
 
 /* 
