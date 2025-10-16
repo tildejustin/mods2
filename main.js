@@ -101,6 +101,7 @@ function currVersionOf(mod, version) {
 
 function refreshMods(config) {
     disableMultiSelect()
+    checkboxes = []
     detailsDiv = document.querySelector(".mods")
     detailsDiv.replaceChildren()
     currMods = filterMods(config)
