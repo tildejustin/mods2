@@ -81,6 +81,7 @@ function filterMods(config) {
 
 function checkRules(mod, config) {
     // TODO sodium mac
+    if (mod.obsolete || currVersionOf(mod, config.version).obsolete) return false
     if (mod.traits == undefined) return true
     if (config.macos && mod.modid == "sodium" && currVersionOf("sodiummac", config.version) != null) return false
     if (mod.traits.includes("mac-only") && !config.macos) return false
@@ -102,7 +103,7 @@ function currVersionOf(mod, version) {
 function refreshMods(config) {
     disableMultiSelect()
     checkboxes = []
-    detailsDiv = document.querySelector(".mods")
+    detailsDiv = document.querySelector("#legal")
     detailsDiv.replaceChildren()
     currMods = filterMods(config)
     for (const mod of currMods) {
@@ -115,8 +116,6 @@ function createEntry(mod, version) {
     details = document.createElement("details")
     details.classList.add("mod-entry")
     summary = document.createElement("summary")
-    // TODO: initial focus on first mod?
-    summary.tabIndex = 1
     checkbox = document.createElement("input")
     checkbox.type = "checkbox"
     checkbox.classList.add("ms-checkbox", "hidden")
@@ -124,8 +123,9 @@ function createEntry(mod, version) {
     label = document.createElement("label")
     label.classList.add("hidden", "ms-checkbox-label")
     label.htmlFor = checkbox.id
+    modName = document.createElement("span")
+    modName.classList.add("name-align")
     versionSpan = document.createElement("span")
-    versionSpan.classList.add("version-align")
     description = document.createElement("p")
     download = document.createElement("a")
     download.href = version.url
@@ -133,15 +133,15 @@ function createEntry(mod, version) {
     download.setAttribute("download", "")
     download.textContent = "[Download]"
     wiki = document.createElement("a")
-    // TODO: check
-    wiki.href = "https://frontcage.com/t/" + mod.modid
-    wiki.textContent = "[Wiki]"
-
+    wiki.href = mod.homepage
+    wiki.textContent = mod.homepage.includes("frontcage.com") ? "[Frontcage]" :
+        mod.homepage.includes("github.com") ? "[GitHub]" : "[Homepage]"
     summary.addEventListener("click", summaryOnClick)
 
     description.prepend(document.createTextNode(mod.description), document.createElement("hr"), download, document.createTextNode(" "), wiki)
+    modName.prepend(document.createTextNode(mod.name))
     versionSpan.prepend(document.createTextNode("v" + version.version))
-    summary.prepend(checkbox, label, document.createTextNode(" " + mod.name), versionSpan)
+    summary.prepend(checkbox, label, modName, versionSpan)
     details.prepend(summary, description)
 
     checkboxes.push(checkbox)
@@ -170,9 +170,9 @@ function summaryOnClick(e) {
     // disable dropdown
     e.preventDefault()
 
-    const checkbox = e.target.tagName == "INPUT" ? e.target :
-        (e.target.tagName == "LABEL" ? e.target.parentElement : e.target)
-            .querySelector("input");
+    let target = e.target
+    while (target.tagName != "SUMMARY") target = target.parentElement 
+    const checkbox = target.querySelector("input");
     checkbox.checked = !checkbox.checked;
 
     if (checkboxes.every(it => !it.checked)) {
@@ -225,7 +225,7 @@ function getConfig() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-6/mods.json")
+    fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/mods.json")
         .then(response => {
             if (!response.ok) {
                 // TODO: warn user

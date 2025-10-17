@@ -14,41 +14,68 @@ a.button {
     text-decoration: none;
 }
 
-details[open] summary {
-    border-bottom: 1px solid #f0f0f0;
-}
-
-details summary::marker {
-    content: "";
-}
-
-:root {
-    --symbol: ">"
-}
-
-details summary::before {
-    content: var(--symbol);
-}
-
-details[open] summary::before {
-    content: "˅";
-}
-
 .options {
     display: flex;
+    flex-wrap: wrap;
     max-width: 600px;
 }
 
 .options>div {
-    width: calc(100% / 3);
+    white-space: nowrap;
+    flex-grow: 1;
 }
 
 .options input {
     margin: auto;
 }
 
-.mod-entry summary {
-    padding: 5px;
+#mods h3 {
+    margin: auto;
+}
+
+#mods p {
+    margin: auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+div#mods > div {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+summary {
+    display: flex;
+    padding: 6px;
+    padding-top: 4px;
+}
+
+[open] summary {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+:root {
+    --symbol: ">"
+}
+
+summary::before {
+    content: var(--symbol);
+}
+
+summary span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+[open] summary::before {
+    content: "v";
+}
+
+span.name-align {
+    flex-grow: 1;
+    padding-left: 5px;
+    padding-right: 5px;
 }
 
 .mod-entry p {
@@ -67,10 +94,6 @@ details[open] summary::before {
 
 .mod-entry:last-child {
     border: 1px solid #f0f0f0;
-}
-
-.version-align {
-    float: right;
 }
 
 body {
@@ -109,6 +132,7 @@ input:is([type="checkbox"], [type="radio"]) {
 input:is([type="checkbox"], [type="radio"])+label::before {
     content: "[ ] ";
     color: #bb86fc;
+    padding-bottom: 2px;
 }
 
 input:is([type="checkbox"], [type="radio"]):checked+label::before {
@@ -122,5 +146,5 @@ input:is([type="checkbox"], [type="radio"]):checked+label::before {
 hr {
     border: none;
     margin-bottom: 2px;
-    margin-top:2px;
+    margin-top: 2px;
 }
