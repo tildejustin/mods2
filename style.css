@@ -45,6 +45,7 @@ div#mods > div {
 }
 
 summary {
+    list-style: none;
     display: flex;
     padding: 6px;
     padding-top: 4px;
