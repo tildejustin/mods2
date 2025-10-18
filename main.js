@@ -324,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }))
 
-    document.querySelectorAll(".updates-list").forEach(it => it.addEventListener("change", e => {
+    document.querySelectorAll(".updates-list").forEach(it => it.addEventListener("change", () => {
         let config = getConfig()
         if (config != null) refreshMods(config)
     }))
