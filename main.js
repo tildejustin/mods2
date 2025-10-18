@@ -8,8 +8,8 @@ var currConfig = null
 // var activeCheckbox = null
 
 const Category = {
-    RANDOM_SEED: "rs",
-    SET_SEED: "ss"
+    RANDOM_SEED: "random_seed",
+    SET_SEED: "set_seed"
 }
 
 var category = Category.RANDOM_SEED
@@ -280,20 +280,21 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector("#macos").checked = macos
         document.querySelector("#version").value = "1.16.1"
         // chrome doesn't autoselect a radio box
-        document.querySelector("#rs").checked = true
+        document.querySelector("#random_seed").checked = true
         setVersionOptions()
         refreshMods(getConfig())
     })
 
-    document.querySelector("#sel-recommended").addEventListener("click", function () {
+    document.querySelector("#sel-recommended").addEventListener("click", () => {
         if (!multiSelect) enableMultiSelect()
-        checkboxes.forEach(it => {
-            const modid = it.id.substring("ms-checkbox-".length)
+        for (checkbox of checkboxes) {
+            const modid = checkbox.id.substring("ms-checkbox-".length)
             const mod = legalMods.find(it => it.modid == modid)
+            if (mod == undefined) continue // ranked has a checkbox
             const version = currVersionOf(mod, currConfig.version)
             const recommended = (mod["recommended"] ?? true) && (version["recommended"] ?? true)
-            it.checked = recommended
-        })
+            checkbox.checked = recommended
+        }
     })
 
     // call the click event listener for a tags with no href
@@ -308,8 +309,64 @@ document.addEventListener("DOMContentLoaded", () => {
         if (config != null) refreshMods(config)
     }))
 
-    // document.querySelector("") // other buttons
-});
+    document.querySelector("#start-sel").addEventListener("click", () => enableMultiSelect())
+    document.querySelector("#deselect-all").addEventListener("click", () => disableMultiSelect())
+
+    document.querySelector("#modpack").addEventListener("click", function () {
+        const config = getConfig()
+        const versions = selectedVersions()
+        if (versions.length == 0) alert("No mods selected!")
+        fetch("https://meta.fabricmc.net/v2/versions/loader")
+            .then(res => res.json())
+            .then(data => generateModpack(config, data[0].version, versions))
+    })
+})
+
+function selectedVersions() {
+    return checkboxes.filter(it => it.checked).map(checkbox => {
+        const modid = checkbox.id.substring("ms-checkbox-".length)
+        // ranked can be selected
+        const mod = allMods.find(it => it.modid == modid)
+        return currVersionOf(mod, currConfig.version)
+    })
+}
+
+function generateModpack(config, loader, versions) {
+    const id = `${config.version}-${config.category}` + (config.macos ? "-macos" : "")
+    const index = {
+        formatVersion: 1,
+        game: "minecraft",
+        versionId: id,
+        name: "MCSR Mods",
+        dependencies: {
+            "fabric-loader": loader,
+            "minecraft": config.version
+        },
+        files: versions.map(it => {
+            return {
+                path: "mods/" + it.url.substring(Math.max(it.url.lastIndexOf("/"), it.url.lastIndexOf("=")) + 1),
+                hashes: {
+                    sha1: it.sha1,
+                    sha512: it.sha512
+                },
+                downloads: [it.url],
+                fileSize: it.fileSize
+            }
+        })
+    }
+    const zip = JSZip()
+    zip.file("modrinth.index.json", JSON.stringify(index))
+    zip.generateAsync({ type: "blob" })
+        .then(it => {
+            const blobUrl = URL.createObjectURL(it)
+            const tempLink = document.createElement("a")
+            tempLink.href = blobUrl
+            tempLink.download = id + ".mrpack"
+            tempLink.type = "application/x-modrinth-modpack+zip"
+            tempLink.click()
+            URL.revokeObjectURL(blobUrl)
+        })
+}
 
 function enableMultiSelect() {
     document.querySelectorAll("summary.legal-listing").forEach(it => it.parentElement.open = false)
@@ -318,6 +375,7 @@ function enableMultiSelect() {
     document.documentElement.style.setProperty("--symbol", "_")
     document.querySelectorAll(".ms-checkbox-label").forEach(it => it.classList.remove("hidden"))
     document.querySelectorAll(".ms-show").forEach(it => it.classList.remove("hidden"))
+    document.querySelectorAll(".ms-hide").forEach(it => it.classList.add("hidden"))
     multiSelect = true
     // activeCheckbox = checkboxes[0]
 }
@@ -327,6 +385,7 @@ function disableMultiSelect() {
     document.documentElement.style.removeProperty("--symbol")
     document.querySelectorAll(".ms-checkbox-label").forEach(it => it.classList.add("hidden"))
     document.querySelectorAll(".ms-show").forEach(it => it.classList.add("hidden"))
+    document.querySelectorAll(".ms-hide").forEach(it => it.classList.remove("hidden"))
     multiSelect = false
     // activeCheckbox = null
 }

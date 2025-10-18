@@ -6,10 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MCSR Legal Mods List</title>
     <meta name="description" content="The official website for downloading mods allowed for Minecraft Speedrunning.">
-    <meta name="keywords" content="MCSRMods, MCSR, mods, Fabric, SRC, speedrun.com, allowed, legal, legalized, permitted">
+    <meta name="keywords"
+        content="MCSRMods, MCSR, mods, Fabric, SRC, speedrun.com, allowed, legal, legalized, permitted">
     <!-- this enough? :P -->
     <link rel="stylesheet" href="style.css">
     <script src="main.js"></script>
+    <script src="dist/jszip.min.js"></script>
     <link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <link rel="canonical" href="https://mods.minecraftspeedrunning.com">
     <meta name="darkreader-lock">
@@ -34,9 +36,11 @@
         <div>
             <p>Category</p>
             <div id="category-div">
-                <input type="radio" name="category" id="rs" class="updates-list"><label for="rs">Random Seed</label>
+                <input type="radio" name="category" id="random_seed" class="updates-list"><label
+                    for="random_seed">Random Seed</label>
                 <br>
-                <input type="radio" name="category" id="ss" class="updates-list"><label for="ss">Set Seed</label>
+                <input type="radio" name="category" id="set_seed" class="updates-list"><label for="set_seed">Set
+                    Seed</label>
             </div>
         </div>
         <div>
@@ -50,8 +54,11 @@
     <br>
     <div>
         <a class="button" id="sel-recommended" tabindex="0">[Select recommended]</a>
-        <a class="button ms-show hidden" tabindex="0">[Download selected]</a>
-        <a class="button ms-show hidden" tabindex="0">[Download as modpack]</a>
+        <!-- needs a server-side zip creator, one day? ex. {version:"1.16.1", mods: ["voyager", "speedrunigt", "seedqueue"]} -->
+        <!-- <a class="button ms-show hidden" id="download-sel" tabindex="0">[Download selected]</a> -->
+        <a class="button ms-hide" id="start-sel" tabindex="0">[Start selection]</a>
+        <a class="button ms-show hidden" id="deselect-all" tabindex="0">[Leave selection]</a>
+        <a class="button ms-show hidden" id="modpack" tabindex="0">[Download as modpack]</a>
     </div>
     <br>
     <div id="mods">
@@ -60,15 +67,14 @@
         <div id="legal"></div>
         <br>
         <h3 hidden class="other-text">Other Mods</h3>
-        <p hidden class="other-text">Not legal but still a part of the MCSR ecosystem, such as practice mods or mods for modded categories.</p>
+        <p hidden class="other-text">Not legal but still a part of the MCSR ecosystem, such as practice mods or mods for
+            modded categories.</p>
         <div id="other"></div>
         <h3 hidden>Obsolete Mods</h3>
         <p hidden>Legal but no reason to use.</p>
     </div>
     <p>
-        Ctrl + click to initiate multiselect<br>
-        Source code at
-        <a
+        Source code at<a
             href="https://github.com/Minecraft-Java-Edition-Speedrunning/mods-site">[Minecraft-Java-Edition-Speedrunning/mods-site]</a>
     </p>
 </body>
