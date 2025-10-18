@@ -1,7 +1,10 @@
 var multiSelect = false
 var checkboxes = [];
-var mods = null
+var legalMods = null
+var otherMods = null
+var allMods = null
 var versions = []
+var currConfig = null
 // var activeCheckbox = null
 
 const Category = {
@@ -25,9 +28,9 @@ specialVersions = {
 const topVersions = ["1.16.1", "1.15.2", "1.11.2", "1.8.9", "1.7.10", "1.16.5", "1.12.2", "1.8", "1.12", "20w14infinite"]
 
 function setVersionOptions() {
-    datalist = document.querySelector("#versions")
+    const datalist = document.querySelector("#versions")
 
-    for (const mod of mods) {
+    for (const mod of legalMods) {
         for (const version of mod.versions) {
             for (const target_version of version.target_version) {
                 if (!versions.includes(target_version)) {
@@ -38,7 +41,7 @@ function setVersionOptions() {
     }
 
     versions.sort((a, b) => {
-        // arbitrary semver, 
+        // arbitrary semver
         if (a == b) return 0
         a = (specialVersions[a] ?? a).split(".")
         b = (specialVersions[b] ?? b).split(".")
@@ -67,10 +70,18 @@ function setVersionOptions() {
 }
 
 function filterMods(config) {
-    res = []
+    const obsoletePredicate = mod => mod.obsolete || currVersionOf(mod, config.version).obsolete
+    let legal = filterModsInner(legalMods, config, mod => !obsoletePredicate(mod))
+    let other = filterModsInner(otherMods, config)
+    let obsolete = filterModsInner(legalMods, config, mod => obsoletePredicate(mod))
+    return [legal, other, obsolete]
+}
+
+function filterModsInner(mods, config, predicate = _ => true) {
+    const res = []
     outer: for (const mod of mods) {
         for (const version of mod.versions) {
-            if (version.target_version.includes(config.version) && checkRules(mod, config)) {
+            if (version.target_version.includes(config.version) && checkRules(mod, config) && predicate(mod)) {
                 res.push(mod)
                 continue outer
             }
@@ -80,8 +91,6 @@ function filterMods(config) {
 }
 
 function checkRules(mod, config) {
-    // TODO sodium mac
-    if (mod.obsolete || currVersionOf(mod, config.version).obsolete) return false
     if (mod.traits == undefined) return true
     if (config.macos && mod.modid == "sodium" && currVersionOf("sodiummac", config.version) != null) return false
     if (mod.traits.includes("mac-only") && !config.macos) return false
@@ -101,63 +110,93 @@ function currVersionOf(mod, version) {
 }
 
 function refreshMods(config) {
+    currConfig = config
     disableMultiSelect()
     checkboxes = []
-    detailsDiv = document.querySelector("#legal")
-    detailsDiv.replaceChildren()
-    currMods = filterMods(config)
-    for (const mod of currMods) {
+
+    const [currLegalMods, currOtherMods, obsoleteMods] = filterMods(config)
+    const obsoleteModids = obsoleteMods.map(it => it.modid)
+
+    const legalDiv = document.querySelector("#legal")
+    legalDiv.replaceChildren()
+    for (const mod of currLegalMods) {
         version = currVersionOf(mod, config.version)
-        detailsDiv.appendChild(createEntry(mod, version))
+        legalDiv.appendChild(createEntry(mod, version, true, obsoleteModids))
+    }
+
+    const otherDiv = document.querySelector("#other")
+    otherDiv.replaceChildren()
+    document.querySelectorAll(".other-text").forEach(it => it.hidden = currOtherMods.length == 0)
+    for (const mod of currOtherMods) {
+        const version = currVersionOf(mod, config.version)
+        otherDiv.appendChild(createEntry(mod, version, mod.modid == "mcsrranked", obsoleteModids))
     }
 }
 
-function createEntry(mod, version) {
-    details = document.createElement("details")
+function createEntry(mod, version, legal, obsoleteMods) {
+    const details = document.createElement("details")
     details.classList.add("mod-entry")
-    summary = document.createElement("summary")
-    checkbox = document.createElement("input")
-    checkbox.type = "checkbox"
-    checkbox.classList.add("ms-checkbox", "hidden")
-    checkbox.id = "ms-checkbox-" + mod.modid
-    label = document.createElement("label")
-    label.classList.add("hidden", "ms-checkbox-label")
-    label.htmlFor = checkbox.id
-    modName = document.createElement("span")
+    const summary = document.createElement("summary")
+    if (legal) {
+        summary.classList.add("legal-listing")
+        // scope shenanigans
+        var checkbox = document.createElement("input")
+        checkbox.type = "checkbox"
+        checkbox.classList.add("ms-checkbox", "hidden")
+        checkbox.id = "ms-checkbox-" + mod.modid
+        label = document.createElement("label")
+        label.classList.add("hidden", "ms-checkbox-label")
+        label.htmlFor = checkbox.id
+    }
+    const modName = document.createElement("span")
     modName.classList.add("name-align")
-    versionSpan = document.createElement("span")
-    description = document.createElement("p")
-    download = document.createElement("a")
+    const versionSpan = document.createElement("span")
+    versionSpan.title = "ID: " + mod.modid
+    const description = document.createElement("p")
+    const download = document.createElement("a")
     download.href = version.url
     download.classList.add("button")
     download.setAttribute("download", "")
     download.textContent = "[Download]"
-    wiki = document.createElement("a")
-    wiki.href = mod.homepage
-    wiki.textContent = mod.homepage.includes("frontcage.com") ? "[Frontcage]" :
-        mod.homepage.includes("github.com") ? "[GitHub]" : "[Homepage]"
+    const homepage = document.createElement("a")
+    homepage.href = mod.homepage;
+    homepage.textContent = "[Homepage]";
+    if (mod.homepage.includes("frontcage.com")) homepage.textContent = "[Frontcage]";
+    else if (mod.homepage.includes("github.com")) homepage.textContent = "[GitHub]";
+    else if (mod.homepage.includes("modrinth.com")) homepage.textContent = "[Modrinth]";
     summary.addEventListener("click", summaryOnClick)
-
-    description.prepend(document.createTextNode(mod.description), document.createElement("hr"), download, document.createTextNode(" "), wiki)
+    description.prepend(document.createElement("br"), download, document.createTextNode(" "), homepage)
+    incompatibilityText = handleIncompatibilities(mod, obsoleteMods)
+    if (incompatibilityText) {
+        description.prepend(document.createElement("br"), document.createTextNode(incompatibilityText))
+    }
+    description.prepend(document.createTextNode(mod.description))
     modName.prepend(document.createTextNode(mod.name))
     versionSpan.prepend(document.createTextNode("v" + version.version))
-    summary.prepend(checkbox, label, modName, versionSpan)
+    summary.prepend(modName, versionSpan)
+    if (legal) summary.prepend(checkbox, label)
     details.prepend(summary, description)
 
-    checkboxes.push(checkbox)
+    if (legal) checkboxes.push(checkbox)
     return details
 }
 
+function handleIncompatibilities(mod, obsoleteMods) {
+    if (!mod.incompatibilities) return false
+    const incompatibilities = mod.incompatibilities
+        .filter(it => !obsoleteMods.includes(it))
+        .map(id => allMods.find(mod => mod.modid == id).name)
+    return incompatibilities.length == 0 ? false : "Incompatible with: " + incompatibilities.join(", ")
+}
+
 function summaryOnClick(e) {
+    let target = e.target
+    while (target.tagName != "SUMMARY") target = target.parentElement
+    if (!target.classList.contains("legal-listing")) return
+
     if (!multiSelect) {
         // regular dropdown interaction
-        if (!e.ctrlKey) {
-            if (window.getSelection) {
-                let selection = window.getSelection();
-                selection.removeAllRanges();
-            }
-            return
-        }
+        if (!e.ctrlKey) return
 
         // ctrl key pressed, turn on multiselect and check the element clicked on
         e.preventDefault()
@@ -170,8 +209,6 @@ function summaryOnClick(e) {
     // disable dropdown
     e.preventDefault()
 
-    let target = e.target
-    while (target.tagName != "SUMMARY") target = target.parentElement 
     const checkbox = target.querySelector("input");
     checkbox.checked = !checkbox.checked;
 
@@ -215,7 +252,7 @@ function summaryOnClick(e) {
  * @returns null if version is invalid, else object with fields version, macos, 
  */
 function getConfig() {
-    let currVersion = document.querySelector("#version").value
+    const currVersion = document.querySelector("#version").value
     if (!versions.includes(currVersion)) return null
     return {
         version: currVersion,
@@ -225,33 +262,38 @@ function getConfig() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/mods.json")
-        .then(response => {
-            if (!response.ok) {
-                // TODO: warn user
-                throw new Error("http error, status: " + response.status)
-            }
-            return response.json()
-        })
-        .then(data => {
-            // TODO: decode url params
-            mods = data["mods"]
-            macos = navigator.userAgentData?.platform == "macOS"
-            document.querySelector("#macos").checked = macos
-            document.querySelector("#version").value = "1.16.1"
-            // chrome doesn't autoselect a radio box
-            document.querySelector("#rs").checked = true
-            setVersionOptions()
-            refreshMods(getConfig())
-        })
+    Promise.all([
+        fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/mods.json"),
+        fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/extra.json")
+    ].map(promise => promise.then(response => {
+        if (!response.ok) {
+            // TODO: warn user
+            throw new Error("http error, status: " + response.status)
+        }
+        return response.json()
+    }))).then(([legal, other]) => {
+        // TODO: decode url params
+        legalMods = legal["mods"]
+        otherMods = other["mods"]
+        allMods = legalMods.concat(otherMods)
+        const macos = navigator.userAgentData?.platform == "macOS"
+        document.querySelector("#macos").checked = macos
+        document.querySelector("#version").value = "1.16.1"
+        // chrome doesn't autoselect a radio box
+        document.querySelector("#rs").checked = true
+        setVersionOptions()
+        refreshMods(getConfig())
+    })
 
-    // TODO: doesn't work with keyboard?
     document.querySelector("#sel-recommended").addEventListener("click", function () {
         if (!multiSelect) enableMultiSelect()
-        // TODO proper recommendations
-        // unrecommended = (mod["recommended"] ?? true) || (version["recommended"] ?? true)
-        // map id -> checkbox + helper function isRecommended(mod)
-        checkboxes.forEach(it => it.checked = true)
+        checkboxes.forEach(it => {
+            const modid = it.id.substring("ms-checkbox-".length)
+            const mod = legalMods.find(it => it.modid == modid)
+            const version = currVersionOf(mod, currConfig.version)
+            const recommended = (mod["recommended"] ?? true) && (version["recommended"] ?? true)
+            it.checked = recommended
+        })
     })
 
     // call the click event listener for a tags with no href
@@ -270,7 +312,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function enableMultiSelect() {
-    document.querySelectorAll("details").forEach(it => it.open = false)
+    document.querySelectorAll("summary.legal-listing").forEach(it => it.parentElement.open = false)
     // this doesn't do what it's supposed to but it removes the ::before element and that's good enough
     // I hate web development so much actually wtf is this behavior. it better be consistent.
     document.documentElement.style.setProperty("--symbol", "_")

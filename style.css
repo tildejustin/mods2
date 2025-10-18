@@ -49,6 +49,7 @@ summary {
     display: flex;
     padding: 6px;
     padding-top: 4px;
+    user-select: none;
 }
 
 [open] summary {
@@ -60,6 +61,10 @@ summary {
 }
 
 summary::before {
+    content: ">";
+}
+
+summary.legal-listing::before {
     content: var(--symbol);
 }
 
