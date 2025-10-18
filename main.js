@@ -261,6 +261,30 @@ function getConfig() {
     }
 }
 
+function handleQueryParameters() {
+    const params = new URLSearchParams(window.location.search)
+    const defaultMacOS = navigator.userAgentData?.platform == "macOS"
+    let version = params.get("version") ?? "1.16.1"
+    if (!versions.includes(version)) version = "1.16.1"
+    let category = params.get("category") ?? Category.RANDOM_SEED
+    if (!Object.values(Category).includes(category)) category = Category.RANDOM_SEED
+    const macos = params.has("macos") ? true : defaultMacOS
+
+    document.querySelector("#version").value = version
+    document.querySelector("#" + category).checked = true
+    document.querySelector("#macos").checked = macos
+}
+
+function handleModQueryParameters() {
+    const params = new URLSearchParams(window.location.search)
+    let mods = params.getAll("mod")
+    if (mods.length == 0) return
+    enableMultiSelect()
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = mods.includes(checkbox.id.substring("ms-checkbox-".length))
+    })
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     Promise.all([
         fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/mods.json"),
@@ -272,17 +296,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
         return response.json()
     }))).then(([legal, other]) => {
-        // TODO: decode url params
         legalMods = legal["mods"]
         otherMods = other["mods"]
         allMods = legalMods.concat(otherMods)
-        const macos = navigator.userAgentData?.platform == "macOS"
-        document.querySelector("#macos").checked = macos
-        document.querySelector("#version").value = "1.16.1"
-        // chrome doesn't autoselect a radio box
-        document.querySelector("#random_seed").checked = true
         setVersionOptions()
+        handleQueryParameters()
         refreshMods(getConfig())
+        handleModQueryParameters()
     })
 
     document.querySelector("#sel-recommended").addEventListener("click", () => {
@@ -298,13 +318,13 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     // call the click event listener for a tags with no href
-    document.querySelector(".button").addEventListener("keyup", function (e) {
+    document.querySelectorAll(".button").forEach(it => it.addEventListener("keyup", e => {
         if (e.code == "Space" || e.code == "Enter") {
             e.target.click()
         }
-    })
+    }))
 
-    document.querySelectorAll(".updates-list").forEach(it => it.addEventListener("change", function (e) {
+    document.querySelectorAll(".updates-list").forEach(it => it.addEventListener("change", e => {
         let config = getConfig()
         if (config != null) refreshMods(config)
     }))
@@ -312,13 +332,29 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#start-sel").addEventListener("click", () => enableMultiSelect())
     document.querySelector("#deselect-all").addEventListener("click", () => disableMultiSelect())
 
-    document.querySelector("#modpack").addEventListener("click", function () {
-        const config = getConfig()
+    document.querySelector("#modpack").addEventListener("click", () => {
+        const config = currConfig
         const versions = selectedVersions()
-        if (versions.length == 0) alert("No mods selected!")
+        if (versions.length == 0) {
+            alert("No mods selected!")
+            return
+        }
         fetch("https://meta.fabricmc.net/v2/versions/loader")
             .then(res => res.json())
             .then(data => generateModpack(config, data[0].version, versions))
+    })
+
+    document.querySelector("#ms-share").addEventListener("click", () => {
+        const config = currConfig
+        const url = new URL(window.location.origin)
+        const params = url.searchParams
+        params.append("version", config.version)
+        params.append("category", config.category)
+        if (config.macos) params.append("macos")
+        checkboxes.filter(it => it.checked).forEach(checkbox => {
+            params.append("mod", checkbox.id.substring("ms-checkbox-".length))
+        })
+        navigator.clipboard.writeText(url)
     })
 })
 
