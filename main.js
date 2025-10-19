@@ -185,7 +185,9 @@ function getIncompatibilitiesText(mod, obsoleteMods) {
     const incompatibilities = mod.incompatibilities
         .filter(it => !obsoleteMods.includes(it))
         .map(id => allMods.find(mod => mod.modid == id).name)
-    return incompatibilities.length == 0 ? false : "Incompatible with: " + incompatibilities.join(", ")
+    const last = incompatibilities.pop()
+    const text = (incompatibilities.length == 0 ? last : incompatibilities.join(", ") + " and " + last)
+    return incompatibilities.length == 0 ? false : "Incompatible with " + text
 }
 
 function summaryOnClick(e) {
@@ -226,22 +228,35 @@ function summaryOnClick(e) {
 }
 
 function updateIncompatibilities() {
+    // this is pretty messy
     const incompatibilities = new Set()
+    const incompatMap = {}
     checkboxes.filter(it => it.checked).forEach(it => {
         const mod = modFromCheckbox(it)
         if (mod.incompatibilities) {
             for (incompatibility of mod.incompatibilities) {
                 incompatibilities.add(incompatibility)
+                const list = incompatMap[incompatibility] ?? (incompatMap[incompatibility] = [])
+                list.push(mod.modid)
             }
         }
     })
 
     for (checkbox of checkboxes) {
         const modid = modidFromCheckbox(checkbox)
+        const label = document.querySelector(`#${checkbox.id}+label`)
         if (!checkbox.checked && incompatibilities.has(modid)) {
             checkbox.classList.add("incompatible")
+            const names = incompatMap[modid].filter(it => {
+                const incompatCheckbox = document.querySelector("#ms-checkbox-" + it)
+                return incompatCheckbox != undefined && incompatCheckbox.checked
+            }).map(nameFromModid)
+            const last = names.pop()
+            const text = (names.length == 0 ? last : names.join(", ") + " and " + last)
+            label.title = `Incompatible with ${text}\nCtrl + click to select anyway`
         } else {
             checkbox.classList.remove("incompatible")
+            label.title = ""
         }
     }
 }
@@ -280,6 +295,11 @@ function handleModQueryParameters() {
     if (mods.length == 0) return
     enableMultiSelect()
     checkboxes.forEach(checkbox => checkbox.checked = mods.includes(modidFromCheckbox(checkbox)))
+    updateIncompatibilities()
+}
+
+function nameFromModid(modid) {
+    return allMods.find(it => it.modid == modid).name
 }
 
 function modidFromCheckbox(checkbox) {
