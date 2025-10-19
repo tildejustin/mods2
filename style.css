@@ -52,7 +52,7 @@ summary {
     user-select: none;
 }
 
-[open] summary {
+[open]:not(.hide-arrow) summary {
     border-bottom: 1px solid #f0f0f0;
 }
 
@@ -133,32 +133,53 @@ a {
 }
 */
 
-input:is([type="checkbox"], [type="radio"]) {
-    appearance: none;
-}
-
 input:is([type="checkbox"], [type="radio"])+label::before {
-    content: "[ ] ";
     color: #bb86fc;
     padding-bottom: 2px;
+    white-space: nowrap;
 }
 
-input:is([type="checkbox"], [type="radio"]):checked+label::before {
+input[type="checkbox"]+label::before {
+    content: "[ ]";
+}
+
+input[type="checkbox"]:checked+label::before {
+    content: "[x]";
+}
+
+input[type="radio"]+label::before {
+    content: "[ ] ";
+}
+
+input[type="radio"]:checked+label::before {
     content: "[x] ";
 }
 
-/* don't need the :not(:checked) because the tag gets removed if the box is selected,  but it's more specific */
-input[type="checkbox"].incompatible:not(:checked)+label::before {
-    content: "[/] ";
+/* don't need the :not(:checked) because the tag gets removed if the box is selected, but it's more specific */
+input[type="checkbox"].incompatible+label::before {
+    content: "[/]";
     color: grey;
+}
+
+input[type="checkbox"].auto-dependency+label::before {
+    content: "[+]";
+    color: cornflowerblue;
+}
+
+input[type="checkbox"].missing-dependency+label::before {
+    content: "[!]";
+    color: red;
+}
+
+input[type="checkbox"].override-incompatible+label::before {
+    content: "[#]";
+    color: pink;
 }
 
 .hidden {
     display: none;
 }
 
-hr {
-    border: none;
-    margin-bottom: 2px;
-    margin-top: 2px;
+.hide-arrow > summary::before {
+    content: ""
 }

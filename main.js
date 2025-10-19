@@ -91,7 +91,7 @@ function filterModsInner(mods, config, predicate = _ => true) {
 }
 
 function checkRules(mod, config) {
-    if (config.macos && mod.modid == "sodium" && currVersionOf(legalMods.find(it => it.modid == "sodiummac"), config.version) != undefined) return false
+    if (config.macos && mod.modid == "sodium" && currVersionOf(modFromModid("sodiummac"), config.version) != undefined) return false
     if (mod.traits == undefined) return true
     if (mod.traits.includes("mac-only") && !config.macos) return false
     if (mod.traits.includes("ssg-only") && config.category != Category.SET_SEED) return false
@@ -173,12 +173,21 @@ function createEntry(mod, version, selectable, obsoleteMods) {
     else if (mod.homepage.includes("github.com")) homepage.textContent = "[GitHub]";
     else if (mod.homepage.includes("modrinth.com")) homepage.textContent = "[Modrinth]";
     summary.addEventListener("click", summaryOnClick)
-    description.prepend(document.createElement("br"), download, document.createTextNode(" "), homepage)
-    const incompatibilityText = getIncompatibilitiesText(mod, obsoleteMods)
-    if (incompatibilityText) {
-        description.prepend(document.createElement("br"), document.createTextNode(incompatibilityText))
+    const parts = getIncompatibilityAndDependencyText(mod, version, obsoleteMods).split("\n")
+    const elements = []
+    for (part of parts) {
+        elements.push(document.createTextNode(part))
+        elements.push(document.createElement("br"))
     }
-    description.prepend(document.createTextNode(mod.description))
+    elements.pop()
+    description.prepend(
+        document.createTextNode(mod.description),
+        ...elements,
+        document.createElement("br"),
+        download,
+        document.createTextNode(" "),
+        homepage
+    )
     modName.prepend(document.createTextNode(mod.name))
     versionSpan.prepend(document.createTextNode("v" + version.version))
     summary.prepend(modName, versionSpan)
@@ -189,15 +198,26 @@ function createEntry(mod, version, selectable, obsoleteMods) {
     return details
 }
 
-function getIncompatibilitiesText(mod, obsoleteMods) {
-    if (!mod.incompatibilities) return false
-    const incompatibilities = mod.incompatibilities
-        .filter(it => !obsoleteMods.includes(it))
-        .map(id => allMods.find(mod => mod.modid == id).name)
-    if(incompatibilities.length == 0) return false
-    const last = incompatibilities.pop()
-    const text = (incompatibilities.length == 0 ? last : incompatibilities.join(", ") + " and " + last)
-    return "Incompatible with " + text
+function nicelyJoin(elements) {
+    const data = [...elements]
+    const last = data.pop()
+    return (data.length == 0 ? last : data.join(", ") + " and " + last)
+}
+
+function getIncompatibilityAndDependencyText(mod, version, obsoleteMods) {
+    let res = ""
+    if (mod.incompatibilities != undefined) {
+        const incompatibilities = mod.incompatibilities
+            .filter(it => !obsoleteMods.includes(it))
+            .map(id => modFromModid(id).name)
+        if (incompatibilities.length > 0) res += "\nIncompatible with " + nicelyJoin(incompatibilities)
+    }
+    if (version.dependencies != undefined) {
+        const dependencies = version.dependencies
+            .map(id => modFromModid(id).name)
+        if (dependencies.length > 0) res += "\nDependent on " + nicelyJoin(dependencies)
+    }
+    return res
 }
 
 function summaryOnClick(e) {
@@ -223,52 +243,163 @@ function summaryOnClick(e) {
     const checkbox = target.querySelector("input");
 
     // allow selecting an incompatible mod
-    if (checkbox.classList.contains("incompatible")) {
+    if (checkbox.classList.contains("incompatible") && !checkbox.classList.contains("override-incompatible")) {
         if (!e.ctrlKey) return
-        // checkbox.classList.remove("incompatible")
+        checkbox.classList.add("override-incompatible")
     }
 
-    checkbox.checked = !checkbox.checked;
+    if (checkbox.classList.contains("auto-dependency")) {
+        checkbox.classList.remove("auto-dependency")
+        return
+    }
 
-    updateIncompatibilities()
+    checkbox.checked = !checkbox.checked
 
-    if (checkboxes.every(it => !it.checked)) {
-        disableMultiSelect()
+    if (checkbox.checked) {
+        autoSelectDeps(modidFromCheckbox(checkbox))
+    } else {
+        checkbox.classList.remove("override-incompatible")
+    }
+
+    updateState()
+
+    // if (checkboxes.every(it => !it.checked)) {
+    //     disableMultiSelect()
+    // }
+}
+
+function autoSelectDeps(modid) {
+    const deps = getDependencies(modid)
+    for (const dep of deps) {
+        const checkbox = checkboxFromModid(dep)
+        if (checkbox == undefined) continue
+        if (checkbox.classList.contains("incompatible")) {
+            console.log("this shouldn't happen normally, decide on proper handling?")
+            return
+        }
+        if (checkbox.checked) continue
+        checkbox.checked = true
+        checkbox.classList.add("auto-dependency")
     }
 }
 
-function updateIncompatibilities() {
-    // this is pretty messy
-    const incompatibilities = new Set()
-    const incompatMap = {}
-    checkboxes.filter(it => it.checked).forEach(it => {
-        const mod = modFromCheckbox(it)
-        if (mod.incompatibilities) {
-            for (incompatibility of mod.incompatibilities) {
-                incompatibilities.add(incompatibility)
-                const list = incompatMap[incompatibility] ?? (incompatMap[incompatibility] = [])
-                list.push(mod.modid)
-            }
-        }
-    })
+function getDependencies(modid) {
+    const initial = currVersionOf(modFromModid(modid), currConfig.version)?.dependencies
+    if (initial == undefined) return []
 
-    for (checkbox of checkboxes) {
-        const modid = modidFromCheckbox(checkbox)
-        const label = document.querySelector(`#${checkbox.id}+label`)
-        if (!checkbox.checked && incompatibilities.has(modid)) {
-            checkbox.classList.add("incompatible")
-            const names = incompatMap[modid].filter(it => {
-                const incompatCheckbox = document.querySelector("#ms-checkbox-" + it)
-                return incompatCheckbox != undefined && incompatCheckbox.checked
-            }).map(nameFromModid)
-            const last = names.pop()
-            const text = (names.length == 0 ? last : names.join(", ") + " and " + last)
-            label.title = `Incompatible with ${text}\nCtrl + click to select anyway`
-        } else {
-            checkbox.classList.remove("incompatible")
-            label.title = ""
+    // baby's first dfs
+    const found = []
+    const queue = []
+    for (const other of initial) {
+        queue.push(other)
+        found.push(other)
+    }
+
+    while (queue.length > 0) {
+        const mod = modFromModid(queue.shift())
+        if (mod == undefined) continue
+        const version = currVersionOf(mod, currConfig.vesion)
+        if (version == undefined || version.dependencies == undefined) continue
+        for (const other of version.dependencies) {
+            if (modid == other || found.includes(mod.modid)) continue
+            found.push(other)
+            queue.push(other)
         }
     }
+    return found
+}
+
+function updateState() {
+    // there's a good chance there's a lot of bugs in this method
+
+    let anyRemoved
+    let missingRequired
+    let requiredBy
+    do {
+        anyRemoved = false
+        missingRequired = {}
+        requiredBy = {}
+        for (const checkbox of checkboxes.filter(it => it.checked)) {
+            const modid = modidFromCheckbox(checkbox)
+            const deps = getDependencies(modid)
+            for (const other of deps) {
+                const checkbox = checkboxFromModid(other)
+                if (checkbox == undefined) throw Error("mod declares a dep not in list, how should this be handled?")
+                if (checkbox.checked == false) {
+                    const set = missingRequired[modid] ?? (missingRequired[modid] = new Set())
+                    set.add(other)
+                } else {
+                    const set = requiredBy[other] ?? (requiredBy[other] = new Set())
+                    set.add(modid)
+                }
+            }
+        }
+
+        for (const checkbox of checkboxes.filter(it => !it.classList.contains("auto-dependency"))) {
+            const modid = modidFromCheckbox(checkbox)
+            if (missingRequired[modid]?.size > 0) {
+                checkbox.classList.add("missing-dependency")
+            } else {
+                checkbox.classList.remove("missing-dependency")
+            }
+        }
+
+        for (const checkbox of checkboxes.filter(it => it.classList.contains("auto-dependency"))) {
+            if (requiredBy[modidFromCheckbox(checkbox)] == undefined) {
+                // changed the table, must reevaluate
+                anyRemoved = true
+                checkbox.checked = false
+                checkbox.classList.remove("auto-dependency")
+            }
+        }
+    } while (anyRemoved)
+
+    const incompatibilities = {}
+    for (const checkbox of checkboxes.filter(it => !it.classList.contains("auto-dependency"))) {
+        const modid = modidFromCheckbox(checkbox)
+        const deps = getDependencies(modid)
+        deps.unshift(modid)
+        for (const depModid of deps) {
+            const mod = modFromModid(depModid)
+            if (mod.incompatibilities == undefined) continue
+            for (const other of mod.incompatibilities) {
+                const otherMod = checkboxFromModid(other)
+                if (otherMod == undefined || !otherMod.checked) continue
+                console.log(modid, otherMod)
+                const set = incompatibilities[modid] ?? (incompatibilities[modid] = new Set())
+                set.add(other)
+            }
+        }
+    }
+
+    for (const checkbox of checkboxes.filter(it => !it.checked || it.classList.contains("override-incompatible"))) {
+        const modid = modidFromCheckbox(checkbox)
+        if (incompatibilities[modid] == undefined) {
+            checkbox.classList.remove("incompatible")
+            checkbox.classList.remove("override-incompatible")
+        }
+        else checkbox.classList.add("incompatible")
+    }
+
+    // set title text
+    for (const checkbox of checkboxes) {
+        const modid = modidFromCheckbox(checkbox)
+        const label = labelFromCheckbox(checkbox)
+        label.title = getTitleText(incompatibilities[modid], missingRequired[modid], requiredBy[modid], checkbox.classList)
+    }
+}
+
+function getTitleText(incompatibilities, missingRequired, requiredBy, classes) {
+    let res = ""
+    if (incompatibilities?.size > 0) {
+        res += "Incompatible with " + nicelyJoin([...incompatibilities].map(it => modFromModid(it).name)) + "\n"
+        if (!classes.contains("auto-dependency") && !classes.contains("override-incompatible")) res += "Ctrl + click to select anyway\n"
+    }
+    if (missingRequired?.size > 0)
+        res += "Requires " + nicelyJoin([...missingRequired].map(it => modFromModid(it).name)) + ` but ${missingRequired.size == 1 ? "it is" : "they are"} not selected\n`
+    if (requiredBy?.size > 0)
+        res += "Required by " + nicelyJoin([...requiredBy].map(it => modFromModid(it).name)) + "\n"
+    return res
 }
 
 /**
@@ -305,11 +436,33 @@ function handleModQueryParameters() {
     if (mods.length == 0) return
     enableMultiSelect()
     checkboxes.forEach(checkbox => checkbox.checked = mods.includes(modidFromCheckbox(checkbox)))
-    updateIncompatibilities()
+    updateState()
+}
+
+function checkboxFromModid(modid) {
+    return document.querySelector(`#ms-checkbox-${modid}`)
+}
+
+function labelFromModid(modid) {
+    return document.querySelector(`#ms-checkbox-${modid}+label`)
+}
+
+function labelFromCheckbox(checkbox) {
+    return checkbox.nextSibling
+}
+
+function modFromModid(modid) {
+    return allMods.find(it => it.modid == modid)
+}
+
+function versionFromModid(modid, version) {
+    const mod = modFromModid(modid)
+    if (mod == undefined) return undefined
+    return currVersionOf(mod, version)
 }
 
 function nameFromModid(modid) {
-    return allMods.find(it => it.modid == modid).name
+    return modFromModid(modid).name
 }
 
 function modidFromCheckbox(checkbox) {
@@ -318,7 +471,7 @@ function modidFromCheckbox(checkbox) {
 
 function modFromCheckbox(checkbox) {
     const modid = modidFromCheckbox(checkbox)
-    return allMods.find(it => it.modid == modid)
+    return modFromModid(modid)
 }
 
 function modVersionFromCheckbox(checkbox, version) {
@@ -328,6 +481,9 @@ function modVersionFromCheckbox(checkbox, version) {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+    const textbox = document.querySelector("#warnings > summary")
+    textbox.textContent = "Loading mods..."
+
     Promise.all([
         fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/mods.json"),
         fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/extra.json")
@@ -346,12 +502,14 @@ document.addEventListener("DOMContentLoaded", () => {
         handleQueryParameters()
         refreshMods(getConfig())
         handleModQueryParameters()
+    }).catch(() => {
+        textbox.textContent = "Loading mods failed, that's not good"
     })
 
     document.querySelector("#sel-recommended").addEventListener("click", () => {
         if (!multiSelect) enableMultiSelect()
         checkboxes.forEach(it => it.checked = false)
-        for (checkbox of checkboxes) {
+        for (const checkbox of checkboxes) {
             const mod = modFromCheckbox(checkbox)
             const version = modVersionFromCheckbox(checkbox, currConfig.version)
             if (mod.modid == "mcsrranked") continue // ranked gets a checkbox
@@ -455,6 +613,8 @@ function enableMultiSelect() {
 
 function disableMultiSelect() {
     checkboxes.forEach(it => it.checked = false)
+    // remove all extra classes
+    updateState()
     document.documentElement.style.removeProperty("--symbol")
     document.querySelectorAll(".ms-checkbox-label").forEach(it => it.classList.add("hidden"))
     document.querySelectorAll(".ms-show").forEach(it => it.classList.add("hidden"))

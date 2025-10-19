@@ -36,17 +36,17 @@
         <div>
             <p>Category</p>
             <div id="category-div">
-                <input type="radio" name="category" id="random_seed" class="updates-list"><label
-                    for="random_seed">Random Seed</label>
+                <input type="radio" name="category" id="random_seed" class="updates-list hidden"><label
+                    for="random_seed"> Random Seed</label>
                 <br>
-                <input type="radio" name="category" id="set_seed" class="updates-list"><label for="set_seed">Set
+                <input type="radio" name="category" id="set_seed" class="updates-list hidden"><label for="set_seed"> Set
                     Seed</label>
             </div>
         </div>
         <div>
             <p>Operating system</p>
             <div id="os-div">
-                <input type="checkbox" id="macos" class="updates-list"><label for="macos">MacOS</label>
+                <input type="checkbox" id="macos" class="updates-list hidden"><label for="macos"> MacOS</label>
             </div>
         </div>
     </div>
@@ -66,7 +66,11 @@
     <div id="mods">
         <h3>Legal Mods</h3>
         <p>Legal for use on speedrun.com, assuming the rules for each one are followed.</p>
-        <div id="legal"></div>
+        <div id="legal">
+            <details class="mod-entry hide-arrow" id="warnings">
+                <summary>This site requires JavaScript. Welcome to the 21st century.</summary>
+            </details>
+        </div>
         <br>
         <h3 hidden class="other-text">Other Mods</h3>
         <p hidden class="other-text">Not legal but still a part of the MCSR ecosystem, such as practice mods or mods for
