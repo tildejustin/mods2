@@ -250,8 +250,16 @@ function summaryOnClick(e) {
 
     if (checkbox.classList.contains("auto-dependency")) {
         checkbox.classList.remove("auto-dependency")
+        checkbox.classList.add("prev-auto-dependency")
         return
     }
+
+    if (checkbox.classList.contains("prev-auto-dependency") && !e.ctrlKey) {
+        checkbox.classList.remove("prev-auto-dependency")
+        checkbox.classList.add("auto-dependency")
+        return
+    }
+
 
     checkbox.checked = !checkbox.checked
 
@@ -277,9 +285,12 @@ function autoSelectDeps(modid) {
             console.log("this shouldn't happen normally, decide on proper handling?")
             return
         }
-        if (checkbox.checked) continue
-        checkbox.checked = true
-        checkbox.classList.add("auto-dependency")
+        if (checkbox.checked) {
+            checkbox.classList.add("prev-auto-dependency")
+        } else {
+            checkbox.checked = true
+            checkbox.classList.add("auto-dependency")
+        }
     }
 }
 
@@ -350,6 +361,13 @@ function updateState() {
                 anyRemoved = true
                 checkbox.checked = false
                 checkbox.classList.remove("auto-dependency")
+                checkbox.classList.remove("prev-auto-dependency")
+            }
+        }
+
+        for (const checkbox of checkboxes.filter(it => it.classList.contains("prev-auto-dependency"))) {
+            if (requiredBy[modidFromCheckbox(checkbox)] == undefined) {
+                checkbox.classList.remove("prev-auto-dependency")
             }
         }
     } while (anyRemoved)
@@ -398,7 +416,7 @@ function getTitleText(incompatibilities, missingRequired, requiredBy, classes) {
     let res = ""
     if (incompatibilities?.size > 0) {
         res += "Incompatible with " + nicelyJoin([...incompatibilities].map(it => modFromModid(it).name)) + "\n"
-        if (!classes.contains("auto-dependency") && !classes.contains("override-incompatible")) res += "Ctrl + click to select anyway\n"
+        if (!classes.contains("auto-dependency") && !classes.contains("override-incompatible")) res += "\n"
     }
     if (missingRequired?.size > 0)
         res += "Requires " + nicelyJoin([...missingRequired].map(it => modFromModid(it).name)) + ` but ${missingRequired.size == 1 ? "it is" : "they are"} not selected\n`
@@ -521,7 +539,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const recommended = (mod["recommended"] ?? true) && (version["recommended"] ?? true)
             checkbox.checked = recommended
         }
-        updateIncompatibilities()
+        updateState()
     })
 
     // call the click event listener for a tags with no href

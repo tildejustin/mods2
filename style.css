@@ -154,16 +154,15 @@ input[type="radio"]+label::before {
 input[type="radio"]:checked+label::before {
     content: "[x] ";
 }
+input[type="checkbox"].auto-dependency+label::before {
+    content: "[+]";
+    color: cornflowerblue;
+}
 
 /* don't need the :not(:checked) because the tag gets removed if the box is selected, but it's more specific */
 input[type="checkbox"].incompatible+label::before {
     content: "[/]";
     color: grey;
-}
-
-input[type="checkbox"].auto-dependency+label::before {
-    content: "[+]";
-    color: cornflowerblue;
 }
 
 input[type="checkbox"].missing-dependency+label::before {
