@@ -115,7 +115,6 @@ function refreshMods(config) {
     checkboxes = []
 
     const [currLegalMods, currOtherMods, obsoleteMods] = filterMods(config)
-    // move ranked to the top. TODO: rather do here than meta?
     const ranked = currOtherMods.find(it => it.modid == "mcsrranked")
     if (ranked) {
         const idx = currOtherMods.indexOf(ranked)
@@ -208,12 +207,13 @@ function getIncompatibilityAndDependencyText(mod, version, obsoleteMods) {
     let res = ""
     if (mod.incompatibilities != undefined) {
         const incompatibilities = mod.incompatibilities
-            .filter(it => !obsoleteMods.includes(it))
+            .filter(it => !obsoleteMods.includes(it) && modFromModid(it) != undefined)
             .map(id => modFromModid(id).name)
         if (incompatibilities.length > 0) res += "\nIncompatible with " + nicelyJoin(incompatibilities)
     }
     if (version.dependencies != undefined) {
         const dependencies = version.dependencies
+            .filter(it => modFromModid(it) != undefined)
             .map(id => modFromModid(id).name)
         if (dependencies.length > 0) res += "\nDependent on " + nicelyJoin(dependencies)
     }
@@ -455,6 +455,10 @@ function handleQueryParameters() {
 
 function handleModQueryParameters() {
     const params = new URLSearchParams(window.location.search)
+    if (params.has("recommended")) {
+        document.querySelector("#sel-recommended").click()
+        return
+    }
     let mods = params.getAll("mod")
     if (mods.length == 0) return
     enableMultiSelect()
@@ -512,8 +516,6 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/extra.json")
     ].map(promise => promise.then(response => {
         if (!response.ok) {
-            // TODO: warn user if failure, using catch
-            // TODO: no javascript warning
             throw new Error("http error, status: " + response.status)
         }
         return response.json()
@@ -564,10 +566,11 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("No mods selected!")
             return
         }
-        // TODO: modpack generation will silently fail if fabric api is down, add catch here or provide default?
+
         fetch("https://meta.fabricmc.net/v2/versions/loader")
             .then(res => res.json())
             .then(data => generateModpack(config, data[0].version, versions))
+            .catch(() => alert("Could not get Fabric Loader version"))
     })
 
     document.querySelector("#ms-share").addEventListener("click", () => {
@@ -576,7 +579,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const params = url.searchParams
         params.append("version", config.version)
         params.append("category", config.category)
-        if (config.macos) params.append("macos")
+        if (config.macos) params.append("macos", "")
         checkboxes.filter(it => it.checked).forEach(checkbox => params.append("mod", modidFromCheckbox(checkbox)))
         navigator.clipboard.writeText(url)
     })
