@@ -39,7 +39,7 @@ a.button {
     padding-bottom: 5px;
 }
 
-div#mods > div {
+div#mods>div {
     padding-top: 5px;
     padding-bottom: 5px;
 }
@@ -145,6 +145,12 @@ input:is([type="checkbox"], [type="radio"])+label::before {
 
 input:is([type="checkbox"], [type="radio"]):checked+label::before {
     content: "[x] ";
+}
+
+/* don't need the :not(:checked) because the tag gets removed if the box is selected,  but it's more specific */
+input[type="checkbox"].incompatible:not(:checked)+label::before {
+    content: "[/] ";
+    color: grey;
 }
 
 .hidden {

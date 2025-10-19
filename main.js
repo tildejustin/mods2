@@ -133,11 +133,11 @@ function refreshMods(config) {
     }
 }
 
-function createEntry(mod, version, legal, obsoleteMods) {
+function createEntry(mod, version, selectable, obsoleteMods) {
     const details = document.createElement("details")
     details.classList.add("mod-entry")
     const summary = document.createElement("summary")
-    if (legal) {
+    if (selectable) {
         summary.classList.add("legal-listing")
         // scope shenanigans
         var checkbox = document.createElement("input")
@@ -166,7 +166,7 @@ function createEntry(mod, version, legal, obsoleteMods) {
     else if (mod.homepage.includes("modrinth.com")) homepage.textContent = "[Modrinth]";
     summary.addEventListener("click", summaryOnClick)
     description.prepend(document.createElement("br"), download, document.createTextNode(" "), homepage)
-    incompatibilityText = handleIncompatibilities(mod, obsoleteMods)
+    const incompatibilityText = getIncompatibilitiesText(mod, obsoleteMods)
     if (incompatibilityText) {
         description.prepend(document.createElement("br"), document.createTextNode(incompatibilityText))
     }
@@ -174,14 +174,14 @@ function createEntry(mod, version, legal, obsoleteMods) {
     modName.prepend(document.createTextNode(mod.name))
     versionSpan.prepend(document.createTextNode("v" + version.version))
     summary.prepend(modName, versionSpan)
-    if (legal) summary.prepend(checkbox, label)
+    if (selectable) summary.prepend(checkbox, label)
     details.prepend(summary, description)
 
-    if (legal) checkboxes.push(checkbox)
+    if (selectable) checkboxes.push(checkbox)
     return details
 }
 
-function handleIncompatibilities(mod, obsoleteMods) {
+function getIncompatibilitiesText(mod, obsoleteMods) {
     if (!mod.incompatibilities) return false
     const incompatibilities = mod.incompatibilities
         .filter(it => !obsoleteMods.includes(it))
@@ -210,7 +210,16 @@ function summaryOnClick(e) {
     e.preventDefault()
 
     const checkbox = target.querySelector("input");
+
+    // allow selecting an incompatible mod
+    if (checkbox.classList.contains("incompatible")) {
+        if (!e.ctrlKey) return
+        // checkbox.classList.remove("incompatible")
+    }
+
     checkbox.checked = !checkbox.checked;
+
+    updateIncompatibilities()
 
     if (checkboxes.every(it => !it.checked)) {
         disableMultiSelect()
@@ -247,6 +256,27 @@ function summaryOnClick(e) {
 
 }
 
+function updateIncompatibilities() {
+    const incompatibilities = new Set()
+    checkboxes.filter(it => it.checked).forEach(it => {
+        const mod = modFromCheckbox(it)
+        if (mod.incompatibilities) {
+            for (incompatibility of mod.incompatibilities) {
+                incompatibilities.add(incompatibility)
+            }
+        }
+    })
+
+    for (checkbox of checkboxes) {
+        const modid = modidFromCheckbox(checkbox)
+        if (!checkbox.checked && incompatibilities.has(modid)) {
+            checkbox.classList.add("incompatible")
+        } else {
+            checkbox.classList.remove("incompatible")
+        }
+    }
+}
+
 /**
  * Gets the config represented by the current state of the website
  * @returns null if version is invalid, else object with fields version, macos, 
@@ -280,9 +310,22 @@ function handleModQueryParameters() {
     let mods = params.getAll("mod")
     if (mods.length == 0) return
     enableMultiSelect()
-    checkboxes.forEach(checkbox => {
-        checkbox.checked = mods.includes(checkbox.id.substring("ms-checkbox-".length))
-    })
+    checkboxes.forEach(checkbox => checkbox.checked = mods.includes(modidFromCheckbox(checkbox)))
+}
+
+function modidFromCheckbox(checkbox) {
+    return checkbox.id.substring("ms-checkbox-".length)
+}
+
+function modFromCheckbox(checkbox) {
+    const modid = modidFromCheckbox(checkbox)
+    return allMods.find(it => it.modid == modid)
+}
+
+function modVersionFromCheckbox(checkbox, version) {
+    const mod = modFromCheckbox(checkbox)
+    if (mod == undefined) return undefined
+    return currVersionOf(mod, version)
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -308,13 +351,13 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#sel-recommended").addEventListener("click", () => {
         if (!multiSelect) enableMultiSelect()
         for (checkbox of checkboxes) {
-            const modid = checkbox.id.substring("ms-checkbox-".length)
-            const mod = legalMods.find(it => it.modid == modid)
-            if (mod == undefined) continue // ranked has a checkbox
-            const version = currVersionOf(mod, currConfig.version)
+            const mod = modFromCheckbox(checkbox)
+            const version = modVersionFromCheckbox(checkbox, currConfig.version)
+            if (mod.modid == "mcsrranked") continue // ranked gets a checkbox
             const recommended = (mod["recommended"] ?? true) && (version["recommended"] ?? true)
             checkbox.checked = recommended
         }
+        updateIncompatibilities()
     })
 
     // call the click event listener for a tags with no href
@@ -351,20 +394,13 @@ document.addEventListener("DOMContentLoaded", () => {
         params.append("version", config.version)
         params.append("category", config.category)
         if (config.macos) params.append("macos")
-        checkboxes.filter(it => it.checked).forEach(checkbox => {
-            params.append("mod", checkbox.id.substring("ms-checkbox-".length))
-        })
+        checkboxes.filter(it => it.checked).forEach(checkbox => params.append("mod", modidFromCheckbox(checkbox)))
         navigator.clipboard.writeText(url)
     })
 })
 
 function selectedVersions() {
-    return checkboxes.filter(it => it.checked).map(checkbox => {
-        const modid = checkbox.id.substring("ms-checkbox-".length)
-        // ranked can be selected
-        const mod = allMods.find(it => it.modid == modid)
-        return currVersionOf(mod, currConfig.version)
-    })
+    return checkboxes.filter(it => it.checked).map(checkbox => modVersionFromCheckbox(checkbox, currConfig.version))
 }
 
 function generateModpack(config, loader, versions) {
