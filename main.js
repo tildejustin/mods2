@@ -115,6 +115,14 @@ function refreshMods(config) {
     checkboxes = []
 
     const [currLegalMods, currOtherMods, obsoleteMods] = filterMods(config)
+    // move ranked to the top. TODO: rather do here than meta?
+    const ranked = currOtherMods.find(it => it.modid == "mcsrranked")
+    if (ranked) {
+        const idx = currOtherMods.indexOf(ranked)
+        // no remove method, what a stdlib it is
+        currOtherMods.splice(idx, idx)
+        currOtherMods.unshift(ranked)
+    }
     const obsoleteModids = obsoleteMods.map(it => it.modid)
 
     const legalDiv = document.querySelector("#legal")
