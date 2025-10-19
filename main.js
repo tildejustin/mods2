@@ -5,6 +5,7 @@ var otherMods = null
 var allMods = null
 var versions = []
 var currConfig = null
+var showObsolete = false
 
 const Category = {
     RANDOM_SEED: "random_seed",
@@ -69,7 +70,7 @@ function setVersionOptions() {
 }
 
 function filterMods(config) {
-    const obsoletePredicate = mod => mod.obsolete || currVersionOf(mod, config.version).obsolete
+    const obsoletePredicate = mod => !showObsolete && (mod.obsolete || currVersionOf(mod, config.version).obsolete)
     let legal = filterModsInner(legalMods, config, mod => !obsoletePredicate(mod))
     let other = filterModsInner(otherMods, config)
     let obsolete = filterModsInner(legalMods, config, mod => obsoletePredicate(mod))
@@ -185,9 +186,10 @@ function getIncompatibilitiesText(mod, obsoleteMods) {
     const incompatibilities = mod.incompatibilities
         .filter(it => !obsoleteMods.includes(it))
         .map(id => allMods.find(mod => mod.modid == id).name)
+    if(incompatibilities.length == 0) return false
     const last = incompatibilities.pop()
     const text = (incompatibilities.length == 0 ? last : incompatibilities.join(", ") + " and " + last)
-    return incompatibilities.length == 0 ? false : "Incompatible with " + text
+    return "Incompatible with " + text
 }
 
 function summaryOnClick(e) {
@@ -340,6 +342,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     document.querySelector("#sel-recommended").addEventListener("click", () => {
         if (!multiSelect) enableMultiSelect()
+        checkboxes.forEach(it => it.checked = false)
         for (checkbox of checkboxes) {
             const mod = modFromCheckbox(checkbox)
             const version = modVersionFromCheckbox(checkbox, currConfig.version)
@@ -449,4 +452,12 @@ function disableMultiSelect() {
     document.querySelectorAll(".ms-show").forEach(it => it.classList.add("hidden"))
     document.querySelectorAll(".ms-hide").forEach(it => it.classList.remove("hidden"))
     multiSelect = false
+}
+
+/**
+ * Only be callable in devtools console. May add a button later.
+ */
+function toggleObsolete() {
+    showObsolete = !showObsolete
+    refreshMods(currConfig)
 }
