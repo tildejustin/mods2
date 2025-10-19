@@ -5,7 +5,6 @@ var otherMods = null
 var allMods = null
 var versions = []
 var currConfig = null
-// var activeCheckbox = null
 
 const Category = {
     RANDOM_SEED: "random_seed",
@@ -91,8 +90,8 @@ function filterModsInner(mods, config, predicate = _ => true) {
 }
 
 function checkRules(mod, config) {
+    if (config.macos && mod.modid == "sodium" && currVersionOf(legalMods.find(it => it.modid == "sodiummac"), config.version) != undefined) return false
     if (mod.traits == undefined) return true
-    if (config.macos && mod.modid == "sodium" && currVersionOf("sodiummac", config.version) != null) return false
     if (mod.traits.includes("mac-only") && !config.macos) return false
     if (mod.traits.includes("ssg-only") && config.category != Category.SET_SEED) return false
     if (mod.traits.includes("rsg-only") && config.category != Category.RANDOM_SEED) return false
@@ -224,36 +223,6 @@ function summaryOnClick(e) {
     if (checkboxes.every(it => !it.checked)) {
         disableMultiSelect()
     }
-
-    /* file explorer behavior: kinda cool but regular people have to be able to use this site unfortunately
-
-    // no ctrl -> don't preserve current selections
-    // act as if ctrl is pressed for keyboard. I may just make that default behavior
-    if (!e.ctrlKey == e.detail != 0) checkboxes.forEach(it => it.checked = false)
-    // every type of click selects the current entry
-    checkbox.checked = !checkbox.checked;
-    // no shift -> overrite curr
-    if (!e.shiftKey) {
-        activeCheckbox = checkbox
-        // if shift, go from "active" (last no shift press) to press
-    } else {
-        if (activeCheckbox == null) throw Error("activeCheckbox is null")
-        start = checkboxes.indexOf(activeCheckbox)
-        end = checkboxes.indexOf(checkbox)
-        // already done at the start
-        if (start == end) return
-        // go upwards if the click is above curr
-        if (start > end) [start, end] = [end, start]
-        for (let i = start; i <= end; i++) checkboxes[i].checked = true
-    }
-
-    // unfortunate side-effect of using shift is it starts selecting text
-    if (window.getSelection) {
-        let selection = window.getSelection();
-        selection.removeAllRanges();
-    }
-    */
-
 }
 
 function updateIncompatibilities() {
@@ -334,7 +303,8 @@ document.addEventListener("DOMContentLoaded", () => {
         fetch("https://raw.githubusercontent.com/tildejustin/mcsr-meta/schema-7/extra.json")
     ].map(promise => promise.then(response => {
         if (!response.ok) {
-            // TODO: warn user
+            // TODO: warn user if failure, using catch
+            // TODO: no javascript warning
             throw new Error("http error, status: " + response.status)
         }
         return response.json()
@@ -382,6 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("No mods selected!")
             return
         }
+        // TODO: modpack generation will silently fail if fabric api is down, add catch here or provide default?
         fetch("https://meta.fabricmc.net/v2/versions/loader")
             .then(res => res.json())
             .then(data => generateModpack(config, data[0].version, versions))
@@ -449,7 +420,6 @@ function enableMultiSelect() {
     document.querySelectorAll(".ms-show").forEach(it => it.classList.remove("hidden"))
     document.querySelectorAll(".ms-hide").forEach(it => it.classList.add("hidden"))
     multiSelect = true
-    // activeCheckbox = checkboxes[0]
 }
 
 function disableMultiSelect() {
@@ -459,5 +429,4 @@ function disableMultiSelect() {
     document.querySelectorAll(".ms-show").forEach(it => it.classList.add("hidden"))
     document.querySelectorAll(".ms-hide").forEach(it => it.classList.remove("hidden"))
     multiSelect = false
-    // activeCheckbox = null
 }
