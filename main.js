@@ -365,7 +365,6 @@ function updateState() {
             for (const other of mod.incompatibilities) {
                 const otherMod = checkboxFromModid(other)
                 if (otherMod == undefined || !otherMod.checked) continue
-                console.log(modid, otherMod)
                 const set = incompatibilities[modid] ?? (incompatibilities[modid] = new Set())
                 set.add(other)
             }
