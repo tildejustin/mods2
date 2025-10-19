@@ -364,7 +364,13 @@ function updateState() {
             if (mod.incompatibilities == undefined) continue
             for (const other of mod.incompatibilities) {
                 const otherMod = checkboxFromModid(other)
-                if (otherMod == undefined || !otherMod.checked) continue
+                if (otherMod == undefined) continue
+                // const lowerDeps = getDependencies(depModid)
+                // const higherDeps = deps.filter(it => !lowerDeps.includes(it))
+                // console.log("higher deps: ", higherDeps)
+                // console.log(modid, depModid, other, otherMod.checked, higherDeps.find(it => checkboxFromModid(it)?.checked)?.checked ?? false)
+                // if other mod is checked *or any mod that depends on other mod is checked*
+                if (!otherMod.checked && checkboxes.filter(it => it.checked).find(it => getDependencies(modidFromCheckbox(it)).includes(other)) == undefined) continue
                 const set = incompatibilities[modid] ?? (incompatibilities[modid] = new Set())
                 set.add(other)
             }
