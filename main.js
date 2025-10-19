@@ -119,8 +119,8 @@ function refreshMods(config) {
     const ranked = currOtherMods.find(it => it.modid == "mcsrranked")
     if (ranked) {
         const idx = currOtherMods.indexOf(ranked)
-        // no remove method, what a stdlib it is
-        currOtherMods.splice(idx, idx)
+        // no remove method, what a stdlib it is. and why does splice work like this instead of start, end???
+        currOtherMods.splice(idx, 1)
         currOtherMods.unshift(ranked)
     }
     const obsoleteModids = obsoleteMods.map(it => it.modid)
