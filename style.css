@@ -1,11 +1,21 @@
-a:not(.button) {
+/* a:not(.button) {
     background: url("/images/external.svg") center right no-repeat;
     padding-right: 14px;
-}
+} */
 
 a.external-pdf {
     background: url("/images/pdf.png") center right no-repeat;
     padding-right: 20px;
+}
+
+h1,
+p {
+    margin: auto;
+}
+
+ul {
+    list-style-type: square;
+    padding-left: 20px;
 }
 
 a.button {
@@ -89,7 +99,6 @@ span.name-align {
     padding: 5px;
     padding-left: 8px;
     padding-bottom: 7px;
-    margin: 0
 }
 
 .mod-entry {
@@ -195,9 +204,4 @@ input[type="checkbox"].override-incompatible+label::before {
     top: 25%;
     max-width: 480px;
     padding: 10px;
-}
-
-#accessibility-warning>p,
-#optifine-warning>p {
-    margin: auto;
 }

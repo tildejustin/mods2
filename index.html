@@ -19,53 +19,67 @@
 
 <body>
     <h1>MCSR Mods List</h1>
+    <br>
     <p>Please familiarize yourself with the rules pertaining to the use of mods, an overview of which can be found
-        below. The complete rules for mods (including OptiFine) can be found in section A.8 of the <a
+        below. The complete rules for mods can be found in section A.8 of the <a
             href="https://rules.minecraftspeedrunning.com/latest" target="_blank" class="external-pdf">[full rules]</a>.
         <br><br>
-        Some mods are only allowed in set seed runs and will cause your run to be rejected if used in random seed runs.
-        Currently, these mods are Set Spawn and ChunkCacher.
-        <br><br>
-        Mods that have legality warnings within them have the force of law and must be followed. Currently, this
-        includes
-        Seedqueue's Show Debug Menu option and Set Spawn's warning if incorrectly configured.
-        <br><br>
-        If you choose to use Extra Options or Dynamic FOV off you are required to follow A.8.12 of the full rules.
-        <br><br>
-        OptiFine is legal for 1.14.4 and below under very specific conditions. You <em>must</em> read A.8.1 of the
-        full rules before using it as the <em><b>default settings are not legal</b></em> (specifically Smooth World and
-        Lazy
-        Chunk Loading, in versions where those options are present), and most other settings are banned. OptiFine is not
-        allowed for glitched or oneshot runs.
-        <br><br>
-        All other mods are banned under the strictest terms, resulting in immediate run rejection. <b>This includes
-            Fabric API</b>, a library mod often used outside of MCSR. None of the allowed mods depend on Fabric API.
-        <br><br>
-        All mods use the <a href="http://https://fabricmc.net/">[Fabric Loader]</a>. This can be set up legally in
-        multiple ways, here is <a href="https://frontcage.com/TODO">[a guide]</a>. Only certain launchers verified to
-        not significantly modify the game are allowed, these are the
-        <a href="https://www.minecraft.net/en-us/download">[Vanilla launcher]</a>,
-        <a href="https://github.com/MCSRLauncher/Launcher">[MCSR Launcher]</a> (recommended),
-        <a href="https://prismlauncher.org">[Prism Launcher]</a>,
-        <a href="https://https://multimc.org">[MultiMC]</a>,
-        <a href="https://modrinth.com/app">[Modrinth App]</a>, and
-        <a href="https://atlauncher.com">[ATLauncher]</a>.
-        Versions 1.3 to 1.13.2 use Legacy Fabric mappings, for which currently the only legal way to install is with
-        MCSR Launcher or the pre-made MCSR-specific <a
+        <span>...<a class="button" id="show-more">[Show more]</a></span>
+    </p>
+    <div class="hidden" id="shown-more">
+        <p>
+            Some mods are only allowed in set seed runs and will cause your run to be rejected if used in other
+            categories. Currently, these mods are Set Spawn and ChunkCacher.
+            <br><br>
+            Mods that have legality warnings within them have the force of law and must be followed. Currently, this
+            includes Seedqueue's Show Debug Menu option and Set Spawn's message in chat if incorrectly configured.
+            <br><br>
+            If you choose to use Extra Options or Dynamic FOV off you are required to follow A.8.12 of the full rules.
+            <br><br>
+            OptiFine is legal for 1.14.4 and below under very specific conditions. You <em>must</em> read A.8.1 of the
+            full rules before using it as the <em><b>default settings are not legal</b></em> (specifically Smooth World
+            and Lazy Chunk Loading, in versions where those options are present), and many other of its other settings
+            are
+            banned. OptiFine is not allowed for glitched or oneshot runs.
+            <br><br>
+            All other mods not listed as allowed are banned under the strictest terms, resulting in immediate run
+            rejection. <b>This includes Fabric API</b>, a library mod often used outside of MCSR. None of the allowed
+            mods depend on Fabric API. This also includes <a href="https://mcsrranked.com/">[MCSR Ranked]</a>, which is
+            for playing head-to-head matches, not for leaderboard speedruns.
+            <br><br>
+            All mods use the <a href="http://https://fabricmc.net/">[Fabric Loader]</a>. This can be set up legally in
+            multiple ways, see <a href="https://frontcage.com/TODO">[this guide]</a>. Only a handful of launchers
+            verified to not significantly modify the game are currently allowed, these are:
+        </p>
+        <ul>
+            <li><a href="https://www.minecraft.net/en-us/download">[Vanilla launcher]</a></li>
+            <li><a href="https://github.com/MCSRLauncher/Launcher">[MCSR Launcher]</a> (recommended)</li>
+            <li><a href="https://prismlauncher.org">[Prism Launcher]</a></li>
+            <li><a href="https://https://multimc.org">[MultiMC]</a></li>
+            <li><a href="https://modrinth.com/app">[Modrinth App]</a></li>
+            <li><a href="https://atlauncher.com">[ATLauncher]</a></li>
+        </ul>
+        Versions 1.3 to 1.13.2 use Legacy Fabric mappings. Currently the only legal way to install these is with
+        MCSR Launcher or the MCSR-specific <a
             href="https://github.com/Minecraft-Java-Edition-Speedrunning/legacy-fabric-instance-generator/releases/latest">[MultiMC
             / Prism Launcher instances]</a>.
-        <b>DO NOT USE</b> the install methods from the Legacy Fabric project themselves, they modify game libaries.
-        Versions 1.0.0 to 1.2.5 use OrnitheMC mappings, and the install options are the same as for Legacy Fabric.
+        <b>DO NOT USE</b> the install methods from the Legacy Fabric project themselves as they modify game libaries.
+        Versions 1.0.0 to 1.2.5 use OrnitheMC mappings, with the same install options as Legacy Fabric.
         Unfortunately, Modrinth modpacks currently do not support either Legacy Fabric or OrnitheMC.
         <br><br>
-        Please note: previously legal builds of mods are often made illegal upon updates for closer vanilla parity or
+        Please note that previously legal builds of mods are often made illegal upon updates for closer vanilla parity
+        or
         bug fixes, DO NOT assume that just because the mods you have installed were legal at the time they are still
         legal now. A grace period of a month to update mods is typically given for parity updates, this is often shorter
         for bug fixes. When using mods you have a responsibility to ensure they are updated. Important changes should be
         posted in the <a href="https://speedrun.com/mc/news">[speedrun.com/mc news tab]</a> but we encourage you to join
         the <a href="https://discord.com/invite/jmdFn3C">[MCSR Discord server aka. Javacord]</a> as
         that is the most consistent way to get annoucements.
-    </p>
+        <br><br>
+        <a class="button" id="show-less">[Show less]</a>
+        </p>
+    </div>
+    <br>
     <div class="options">
         <div>
             <p>Game version</p>

@@ -375,7 +375,9 @@ function updateState() {
     } while (anyRemoved)
 
     const incompatibilities = {}
-    for (const checkbox of checkboxes.filter(it => !it.classList.contains("auto-dependency"))) {
+    // uncommended parts -> if uncommended, it will mark as incompatible mods that are incompatible with dependencies of selected mods,
+    // even those dependencies are manually deselected 
+    for (const checkbox of checkboxes /* .filter(it => !it.classList.contains("auto-dependency")) */) {
         const modid = modidFromCheckbox(checkbox)
         const deps = getDependencies(modid)
         deps.unshift(modid)
@@ -390,7 +392,7 @@ function updateState() {
                 // console.log("higher deps: ", higherDeps)
                 // console.log(modid, depModid, other, otherMod.checked, higherDeps.find(it => checkboxFromModid(it)?.checked)?.checked ?? false)
                 // if other mod is checked *or any mod that depends on other mod is checked*
-                if (!otherMod.checked && checkboxes.filter(it => it.checked).find(it => getDependencies(modidFromCheckbox(it)).includes(other)) == undefined) continue
+                if (!otherMod.checked /* && checkboxes.filter(it => it.checked).find(it => getDependencies(modidFromCheckbox(it)).includes(other)) == undefined */) continue
                 const set = incompatibilities[modid] ?? (incompatibilities[modid] = new Set())
                 set.add(other)
             }
@@ -602,6 +604,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#optifine-warning>.closer").addEventListener("click", () => {
         warnedOptiFine = true
         document.querySelector("#optifine-warning").classList.add("hidden")
+    })
+
+    document.querySelector("#show-more").addEventListener("click", e => {
+        e.target.parentElement.classList.add("hidden")
+        document.querySelector("#shown-more").classList.remove("hidden")
+    })
+
+    document.querySelector("#show-less").addEventListener("click", () => {
+        document.querySelector("#show-more").parentElement.classList.remove("hidden")
+        document.querySelector("#shown-more").classList.add("hidden")
     })
 })
 
