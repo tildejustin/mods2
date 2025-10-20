@@ -29,19 +29,19 @@ a.button {
     margin: auto;
 }
 
-#mods h3 {
-    margin: auto;
+#mods {
+    position: relative;
 }
 
-#mods p {
-    margin: auto;
-    padding-top: 5px;
-    padding-bottom: 5px;
+#mods>h3 {
+    margin: 0;
+    padding: 0;
 }
 
-div#mods>div {
+#mods>p {
+    margin: 0;
     padding-top: 5px;
-    padding-bottom: 5px;
+    padding-bottom: 10px;
 }
 
 summary {
@@ -154,6 +154,7 @@ input[type="radio"]+label::before {
 input[type="radio"]:checked+label::before {
     content: "[x] ";
 }
+
 input[type="checkbox"].auto-dependency+label::before {
     content: "[+]";
     color: cornflowerblue;
@@ -179,6 +180,24 @@ input[type="checkbox"].override-incompatible+label::before {
     display: none;
 }
 
-.hide-arrow > summary::before {
+.hide-arrow>summary::before {
     content: ""
+}
+
+#accessibility-warning,
+#optifine-warning {
+    position: absolute;
+    top: 300px;
+    border: 1px solid #f0f0f0;
+    background-color: black;
+    left: 50px;
+    right: 50px;
+    top: 25%;
+    max-width: 480px;
+    padding: 10px;
+}
+
+#accessibility-warning>p,
+#optifine-warning>p {
+    margin: auto;
 }

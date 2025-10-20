@@ -6,6 +6,8 @@ var allMods = null
 var versions = []
 var currConfig = null
 var showObsolete = false
+var warnedOptiFine = false
+var warnedExtraOptions = false
 
 const Category = {
     RANDOM_SEED: "random_seed",
@@ -410,6 +412,14 @@ function updateState() {
         const label = labelFromCheckbox(checkbox)
         label.title = getTitleText(incompatibilities[modid], missingRequired[modid], requiredBy[modid], checkbox.classList)
     }
+
+    for (const checkbox of checkboxes.filter(it => it.checked)) {
+        const modid = modidFromCheckbox(checkbox)
+        if (modid == "optifine" && !warnedOptiFine)
+            document.querySelector("#optifine-warning").classList.remove("hidden")
+        else if (modid == "extra-options" && !warnedExtraOptions)
+            document.querySelector("#accessibility-warning").classList.remove("hidden")
+    }
 }
 
 function getTitleText(incompatibilities, missingRequired, requiredBy, classes) {
@@ -582,6 +592,16 @@ document.addEventListener("DOMContentLoaded", () => {
         if (config.macos) params.append("macos", "")
         checkboxes.filter(it => it.checked).forEach(checkbox => params.append("mod", modidFromCheckbox(checkbox)))
         navigator.clipboard.writeText(url)
+    })
+
+    document.querySelector("#accessibility-warning>.closer").addEventListener("click", () => {
+        warnedExtraOptions = true
+        document.querySelector("#accessibility-warning").classList.add("hidden")
+    })
+
+    document.querySelector("#optifine-warning>.closer").addEventListener("click", () => {
+        warnedOptiFine = true
+        document.querySelector("#optifine-warning").classList.add("hidden")
     })
 })
 
