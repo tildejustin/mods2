@@ -15,7 +15,8 @@ p {
 
 ul {
     list-style-type: square;
-    padding-left: 20px;
+    padding: 10px 0px 10px 20px;
+    margin: 0;
 }
 
 a.button {
@@ -33,6 +34,10 @@ a.button {
 .options>div {
     white-space: nowrap;
     flex-grow: 1;
+}
+
+.options p {
+    padding-bottom: 5px;
 }
 
 .options input {
@@ -115,7 +120,7 @@ body {
     font-family: Consolas, monaco, monospace;
     background-color: black;
     color: #f0f0f0;
-    max-width: 800px;
+    max-width: 1000px;
     margin-left: 20px;
     margin-right: 20px;
 }
@@ -204,4 +209,9 @@ input[type="checkbox"].override-incompatible+label::before {
     top: 25%;
     max-width: 480px;
     padding: 10px;
+}
+
+.disabled {
+    color: grey;
+    pointer-events: none;
 }

@@ -571,6 +571,27 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector("#start-sel").addEventListener("click", () => enableMultiSelect())
     document.querySelector("#deselect-all").addEventListener("click", () => disableMultiSelect())
 
+    document.querySelector("#mods-zip").addEventListener("click", e => {
+        const config = currConfig
+        const mods = selectedMods()
+        if (mods.length == 0) {
+            alert("No mods selected!")
+            return
+        }
+        e.target.classList.add("disabled")
+        const url = new URL("https://zip-creator.tildejustin.dev")
+        // const url = new URL("http://localhost:8787")
+        url.searchParams.append("version", config.version)
+        for (const mod of mods) {
+            url.searchParams.append("mod", mod)
+        }
+        fetch(url).then(res => {
+            if (!res.ok) throw Error("Zip worker request failed")
+            return res.blob()
+        }).then(it => downloadBlob(it, "mods.zip", "application/zip"))
+            .then(() => e.target.classList.remove("disabled"))
+    })
+
     document.querySelector("#modpack").addEventListener("click", () => {
         const config = currConfig
         const versions = selectedVersions()
@@ -617,6 +638,10 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 })
 
+function selectedMods() {
+    return checkboxes.filter(it => it.checked).map(checkbox => modidFromCheckbox(checkbox))
+}
+
 function selectedVersions() {
     return checkboxes.filter(it => it.checked).map(checkbox => modVersionFromCheckbox(checkbox, currConfig.version))
 }
@@ -647,15 +672,18 @@ function generateModpack(config, loader, versions) {
     const zip = JSZip()
     zip.file("modrinth.index.json", JSON.stringify(index))
     zip.generateAsync({ type: "blob" })
-        .then(it => {
-            const blobUrl = URL.createObjectURL(it)
-            const tempLink = document.createElement("a")
-            tempLink.href = blobUrl
-            tempLink.download = id + ".mrpack"
-            tempLink.type = "application/x-modrinth-modpack+zip"
-            tempLink.click()
-            URL.revokeObjectURL(blobUrl)
-        })
+        .then(it => downloadBlob(it, id + ".mrpack", "application/x-modrinth-modpack+zip"))
+}
+
+function downloadBlob(blob, name, mime) {
+    const blobUrl = URL.createObjectURL(blob)
+    const tempLink = document.createElement("a")
+    tempLink.href = blobUrl
+    tempLink.download = name
+    tempLink.type = mime
+    tempLink.click()
+    URL.revokeObjectURL(blobUrl)
+
 }
 
 function enableMultiSelect() {
