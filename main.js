@@ -42,24 +42,7 @@ function setVersionOptions() {
         }
     }
 
-    versions.sort((a, b) => {
-        // arbitrary semver
-        if (a == b) return 0
-        a = (specialVersions[a] ?? a).split(".")
-        b = (specialVersions[b] ?? b).split(".")
-        const max_len = Math.max(a.length, b.length)
-        for (let i = 0; i < max_len; i++) {
-            a_i = parseInt(a[i] ?? 0)
-            b_i = parseInt(b[i] ?? 0)
-            if (a_i != b_i) return b_i - a_i
-        }
-        a_pre = a.at(-1).split("-")[1]
-        b_pre = b.at(-1).split("-")[1]
-        if (a_pre == b_pre) return 0
-        if (a_pre == undefined) return -1
-        if (b_pre == undefined) return 1
-        return b_pre.localeCompare(a_pre, "en_US")
-    })
+    versions.sort(semverCompare)
 
     versions = versions.filter(version => !topVersions.includes(version))
     versions.unshift(...topVersions)
@@ -69,6 +52,25 @@ function setVersionOptions() {
         option.value = version
         datalist.appendChild(option)
     }
+}
+
+function semverCompare(a, b) {
+    // arbitrary semver
+    if (a == b) return 0
+    a = (specialVersions[a] ?? a).split(".")
+    b = (specialVersions[b] ?? b).split(".")
+    const max_len = Math.max(a.length, b.length)
+    for (let i = 0; i < max_len; i++) {
+        a_i = parseInt(a[i] ?? 0)
+        b_i = parseInt(b[i] ?? 0)
+        if (a_i != b_i) return b_i - a_i
+    }
+    a_pre = a.at(-1).split("-")[1]
+    b_pre = b.at(-1).split("-")[1]
+    if (a_pre == b_pre) return 0
+    if (a_pre == undefined) return -1
+    if (b_pre == undefined) return 1
+    return b_pre.localeCompare(a_pre, "en_US")
 }
 
 function filterMods(config) {
@@ -694,6 +696,11 @@ function enableMultiSelect() {
     document.querySelectorAll(".ms-checkbox-label").forEach(it => it.classList.remove("hidden"))
     document.querySelectorAll(".ms-show").forEach(it => it.classList.remove("hidden"))
     document.querySelectorAll(".ms-hide").forEach(it => it.classList.add("hidden"))
+    if (semverCompare("1.14-", currConfig.version) <= 0) {
+        document.querySelector("#modpack").classList.add("hidden")
+    } else {
+        document.querySelector("#modpack").classList.remove("hidden")
+    }
     multiSelect = true
 }
 
