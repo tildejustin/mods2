@@ -1,0 +1,10 @@
+{
+  "name": "mcsr-zip-creator",
+  "main": "worker.js",
+  "compatibility_date": "2025-10-22",
+  "workers_dev": false,
+  "route": {
+    "pattern": "zip-creator.tildejustin.dev",
+    "custom_domain": true
+  }
+}
