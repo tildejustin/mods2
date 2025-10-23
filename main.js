@@ -44,10 +44,10 @@ function setVersionOptions() {
 
     versions.sort(semverCompare)
 
-    versions = versions.filter(version => !topVersions.includes(version))
-    versions.unshift(...topVersions)
+    const topVersionsSort = versions.filter(version => !topVersions.includes(version))
+    topVersionsSort.unshift(...topVersions)
 
-    for (const version of versions) {
+    for (const version of topVersionsSort) {
         let option = new Option()
         option.value = version
         datalist.appendChild(option)
@@ -144,7 +144,7 @@ function refreshMods(config) {
     }
 }
 
-function createEntry(mod, version, selectable, obsoleteMods) {
+function createEntry(mod, version, selectable, obsoleteMods, config) {
     const details = document.createElement("details")
     details.classList.add("mod-entry")
     const summary = document.createElement("summary")
@@ -207,6 +207,41 @@ function nicelyJoin(elements) {
     return (data.length == 0 ? last : data.join(", ") + " and " + last)
 }
 
+const skipVersions = ["1.13.1", "1.12.1", "1.11.1", "1.11", "1.10.1", "1.10", "1.9.3", "1.9.2", "1.9.1", "1.9"]
+skipVersions.push(...Object.keys(specialVersions))
+
+function buildRanges(mod) {
+    const compatibleVersions = mod.versions.flatMap(it => it.target_version)
+    compatibleVersions.sort(semverCompare)
+
+    const ranges = []
+    let range = 0
+    if (!versions.includes(compatibleVersions[0])) {
+        throw new Error("unrecoverable")
+    }
+    let i = 0
+    let j = versions.indexOf(compatibleVersions[0])
+    while (i < compatibleVersions.length && j < versions.length) {
+        if (!versions.includes(compatibleVersions[i]) || skipVersions.includes(compatibleVersions[i])) {
+            i++
+            continue
+        }
+        if (skipVersions.includes(versions[j])) {
+            j++
+            continue
+        }
+        if (compatibleVersions[i] == versions[j]) {
+            (ranges[range] ?? (ranges[range] = [])).push(compatibleVersions[i])
+            i++
+            j++
+        } else {
+            if (ranges[range] != undefined) range++
+            j++
+        }
+    }
+    return ranges.map(it => it.length == 1 ? it : it[0] + "-" + it.at(-1))
+}
+
 function getIncompatibilityAndDependencyText(mod, version, obsoleteMods) {
     let res = ""
     if (mod.incompatibilities != undefined) {
@@ -221,6 +256,7 @@ function getIncompatibilityAndDependencyText(mod, version, obsoleteMods) {
             .map(id => modFromModid(id).name)
         if (dependencies.length > 0) res += "\nDependent on " + nicelyJoin(dependencies)
     }
+    res += "\nAvailable for " + nicelyJoin(buildRanges(mod))
     return res
 }
 
@@ -541,7 +577,8 @@ document.addEventListener("DOMContentLoaded", () => {
         handleQueryParameters()
         refreshMods(getConfig())
         handleModQueryParameters()
-    }).catch(() => {
+    }).catch(e => {
+        console.log(e)
         textbox.textContent = "Loading mods failed, that's not good"
     })
 
@@ -638,6 +675,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector("#show-more").parentElement.classList.remove("hidden")
         document.querySelector("#shown-more").classList.add("hidden")
     })
+
+    document.querySelector("#obsolete").addEventListener("click", e => setObsolete(e.target.checked))
 })
 
 function selectedMods() {
@@ -715,10 +754,7 @@ function disableMultiSelect() {
     multiSelect = false
 }
 
-/**
- * Only be callable in devtools console. May add a button later.
- */
-function toggleObsolete() {
-    showObsolete = !showObsolete
+function setObsolete(obsolete) {
+    showObsolete = obsolete
     refreshMods(currConfig)
 }

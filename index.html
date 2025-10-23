@@ -22,58 +22,57 @@
     <br>
     <p><a href="/">[Home]</a> | <a href="/generate">[Legacy Fabric Instance Generator]</a></p>
     <br>
-    <p>Please familiarize yourself with the rules pertaining to the use of mods, an overview of which can be found
-        below. The complete rules for mods can be found in section A.8 of the <a
-            href="https://rules.minecraftspeedrunning.com/latest" target="_blank" class="external-pdf">[full rules]</a>.
+    <p>Before using any mods, please read over the overview of the rules below (press [Show more]). The complete rules
+        for mods can be found in section A.8 of the <a href="https://rules.minecraftspeedrunning.com/latest"
+            target="_blank" class="external-pdf">[full rules]</a>.
         <br><br>
         <span>...<a class="button" id="show-more">[Show more]</a></span>
     </p>
     <div class="hidden" id="shown-more">
-        <p>
-            Some mods are only allowed in set seed runs and will cause your run to be rejected if used in other
-            categories. Currently, these mods are Set Spawn and ChunkCacher.
-            <br><br>
-            Mods that have legality warnings within them have the force of law and must be followed. Currently, this
-            includes Seedqueue's Show Debug Menu option and Set Spawn's message in chat if incorrectly configured.
-            <br><br>
-            If you choose to use Extra Options or Dynamic FOV off you are required to follow A.8.12 of the full rules.
-            <br><br>
-            OptiFine is legal for 1.14.4 and below under very specific conditions. You <em>must</em> read A.8.1 of the
-            full rules before using it as the <em><b>default settings are not legal</b></em> (specifically Smooth World
-            and Lazy Chunk Loading, in versions where those options are present), and many other of its other settings
-            are
-            banned. OptiFine is not allowed for glitched or oneshot runs.
-            <br><br>
-            All other mods not listed as allowed are banned under the strictest terms, resulting in immediate run
-            rejection. <b>This includes Fabric API</b>, a library mod often used outside of MCSR. None of the allowed
-            mods depend on Fabric API. This also includes <a href="https://mcsrranked.com/">[MCSR Ranked]</a>, which is
-            for playing head-to-head matches, not for leaderboard speedruns.
-            <br><br>
-            All mods use the <a href="http://https://fabricmc.net/">[Fabric Loader]</a>. This can be set up legally in
-            multiple ways, see <a href="https://frontcage.com/TODO">[this guide]</a>. Only a handful of launchers
-            verified to not significantly modify the game are currently allowed, these are:
-        </p>
-        <ul>
+        Some mods are only allowed in set seed runs and will cause your run to be rejected if used in other
+        categories. Currently, these mods are Set Spawn and ChunkCacher. Legality warnings inside mods have the force of
+        law and must be followed. Currently, this includes Seedqueue's Show Debug Menu option and Set Spawn's message in
+        chat if incorrectly configured. If you choose to use Extra Options or Dynamic FOV off in OptiFine you are
+        required to follow A.8.12 of the full rules, which disallows certain abuses.
+        <br><br>
+        OptiFine is legal for 1.14.4 and below and only under very specific conditions. You must read A.8.1
+        of the full rules before using it as the <em><b>default settings are not legal</b></em>, and many other of its
+        other settings are banned. OptiFine is not allowed for glitched or oneshot runs.
+        <br><br>
+        All other mods not explicitly allowed are banned, with penalty of immediate run rejection. <b>This includes
+            Fabric API</b>, a library mod often used outside of MCSR. None of the allowed mods require Fabric API.
+        This also includes <a href="https://mcsrranked.com/">[MCSR Ranked]</a>, which is for playing head-to-head
+        matches, not leaderboard speedruns.
+        <br><br>
+        All mods use the <a href="http://https://fabricmc.net/">[Fabric Loader]</a>. Only a handful of launchers
+        verified to not significantly modify the game are currently allowed, these are: The
+        <a href="https://www.minecraft.net/en-us/download">[Vanilla launcher]</a>,
+        <a href="https://github.com/MCSRLauncher/Launcher">[MCSR Launcher]</a> (recommended),
+        <a href="https://prismlauncher.org">[Prism Launcher]</a>,
+        <a href="https://https://multimc.org">[MultiMC]</a>,
+        <a href="https://modrinth.com/app">[Modrinth App]</a>, and
+        <a href="https://atlauncher.com">[ATLauncher]</a>.
+        <!-- <ul>
             <li><a href="https://www.minecraft.net/en-us/download">[Vanilla launcher]</a></li>
             <li><a href="https://github.com/MCSRLauncher/Launcher">[MCSR Launcher]</a> (recommended)</li>
             <li><a href="https://prismlauncher.org">[Prism Launcher]</a></li>
             <li><a href="https://https://multimc.org">[MultiMC]</a></li>
             <li><a href="https://modrinth.com/app">[Modrinth App]</a></li>
             <li><a href="https://atlauncher.com">[ATLauncher]</a></li>
-        </ul>
-        Versions 1.3 to 1.13.2 use Legacy Fabric mappings. Currently the only legal way to install these is with
-        MCSR Launcher or the MCSR-specific <a href="/generate">[MultiMC / Prism Launcher instances generator]</a>.
+        </ul> -->
+        <br><br>
+        Mods for versions 1.3 to 1.13.2 use Legacy Fabric. Currently the only legal way to install this is with
+        the MCSR Launcher or the MCSR-specific <a href="/generate">[MultiMC / Prism Launcher instances]</a>.
         <b>DO NOT USE</b> the install methods from the Legacy Fabric project themselves as they modify game libaries.
-        Versions 1.0.0 to 1.2.5 use OrnitheMC mappings, with the same install options as Legacy Fabric.
-        Unfortunately, Modrinth modpacks currently do not support either Legacy Fabric or OrnitheMC.
+        Mods for versions 1.0.0 to 1.2.5 use OrnitheMC, with the same install options as Legacy Fabric.
+        Unfortunately, Modrinth modpacks currently do not support either.
         <br><br>
         Please note that previously legal builds of mods are often made illegal upon updates for closer vanilla parity
-        or
-        bug fixes, DO NOT assume that just because the mods you have installed were legal at the time they are still
+        or bug fixes, DO NOT assume that just because the mods you have installed were legal at the time they are still
         legal now. A grace period of a month to update mods is typically given for parity updates, this is often shorter
         for bug fixes. When using mods you have a responsibility to ensure they are updated. Important changes should be
-        posted in the <a href="https://speedrun.com/mc/news">[speedrun.com/mc news tab]</a> but we encourage you to join
-        the <a href="https://discord.com/invite/jmdFn3C">[MCSR Discord server aka. Javacord]</a> as
+        posted in <a href="https://speedrun.com/mc/news">[SRC news]</a> but we encourage you to join
+        the <a href="https://discord.com/invite/jmdFn3C">[MCSR Discord server]</a> (aka. Javacord) as
         that is the most consistent way to get annoucements.
         <br><br>
         <a class="button" id="show-less">[Show less]</a>
@@ -92,7 +91,8 @@
             <p>Category</p>
             <div id="category-div">
                 <input type="radio" name="category" id="random_seed" class="updates-list hidden"><label
-                    for="random_seed"> Random Seed</label>
+                    for="random_seed">
+                    Random Seed</label>
                 <br>
                 <input type="radio" name="category" id="set_seed" class="updates-list hidden"><label for="set_seed"> Set
                     Seed</label>
@@ -155,6 +155,12 @@
     </div>
     <br>
     <p>
+        Tips and tricks:<br>
+        Hover over the version to see the Mod ID.<br>
+        Ctrl + click on an incompatible mod to select it anyway.<br>
+        Ctrl + click on a manually selected auto-selected mod to deselect it anyway.<br>
+        Toggle obsolete mods: <input type="checkbox" id="obsolete" class="hidden"><label for="obsolete"></label><br>
+        <br>
         Source code at <a
             href="https://github.com/Minecraft-Java-Edition-Speedrunning/mods-site">[Minecraft-Java-Edition-Speedrunning/mods-site]</a>
     </p>
