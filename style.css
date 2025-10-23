@@ -204,10 +204,11 @@ input[type="checkbox"].override-incompatible+label::before {
     top: 300px;
     border: 1px solid #f0f0f0;
     background-color: black;
-    left: 50px;
-    right: 50px;
+    left: 35px;
+    right: 35px;
     top: 25%;
-    max-width: 480px;
+    /* .mod_entry width - left - right - padding-left - padding-right */
+    max-width: 710px;
     padding: 10px;
 }
 
