@@ -596,7 +596,7 @@ document.addEventListener("DOMContentLoaded", () => {
     })
 
     // call the click event listener for a tags with no href
-    document.querySelectorAll(".button").forEach(it => it.addEventListener("keyup", e => {
+    document.querySelectorAll(".button, label").forEach(it => it.addEventListener("keyup", e => {
         if (e.code == "Space" || e.code == "Enter") {
             e.target.click()
         }
