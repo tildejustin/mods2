@@ -375,7 +375,10 @@ function updateState() {
             const deps = getDependencies(modid)
             for (const other of deps) {
                 const checkbox = checkboxFromModid(other)
-                if (checkbox == undefined) throw Error("mod declares a dep not in list, how should this be handled?")
+                if (checkbox == undefined) {
+                    console.log("mod declares a dep not in list, how should this be handled?")
+                    continue
+                }
                 if (checkbox.checked == false) {
                     const set = missingRequired[modid] ?? (missingRequired[modid] = new Set())
                     set.add(other)
