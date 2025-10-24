@@ -3,7 +3,10 @@ import JSZip from "jszip"
 // TODO error handling, more 400 responses / reply with mods that are missing as well
 export default {
     async fetch(request, env, ctx) {
-        const { searchParams } = new URL(request.url)
+        const { searchParams, origin } = new URL(request.url)
+        if (!origin.endsWith("tildejustin.dev") && !origin.endsWith("minecraftspeedrunning.com")) {
+            origin == undefined
+        }
         const version = searchParams.get("version")
         const mods = searchParams.getAll("mod")
         if (version == undefined || mods.length == 0) {
@@ -26,13 +29,18 @@ export default {
         for (const modInfo of allMods) {
             zip.file(modInfo.filename, modInfo.data)
         }
+        const headers = {
+            "Content-Type": "application/x-modrinth-modpack+zip",
+            "Content-Disposition": "attachment; filename=mods.zip",
+            Vary: "Origin",
+        }
+        if (origin != undefined) {
+            headers["Access-Control-Allow-Origin"] = origin
+        }
         const blob = await zip.generateAsync({ type: "blob" })
         return new Response(blob, {
             message: "",
-            headers: {
-                "Content-Type": "application/x-modrinth-modpack+zip",
-                "Content-Disposition": "attachment; filename=mods.zip"
-            }
+            headers: headers
         })
     }
 }
