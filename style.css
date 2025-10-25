@@ -8,6 +8,11 @@ a.external-pdf {
     padding-right: 20px;
 }
 
+@font-face {
+    font-family: Inter;
+    src: url("/dist/inter.woff2");
+}
+
 h1,
 p {
     margin: auto;
@@ -72,7 +77,10 @@ summary {
 }
 
 :root {
-    --symbol: ">"
+    --symbol: ">";
+    --link: rgb(79, 156, 255);
+    /* --link: #bb86fc; */
+    --checkbox: #bb86fc;
 }
 
 summary::before {
@@ -99,17 +107,24 @@ span.name-align {
     padding-right: 5px;
 }
 
+summary::before,
+input+label::before {
+    font-family: Consolas, monaco, monospace;
+}
+
 .mod-entry p {
     /* yikes */
     padding: 5px;
     padding-left: 8px;
     padding-bottom: 7px;
+    font-size: 16px;
 }
 
 .mod-entry {
     max-width: 800px;
     border: 1px solid #f0f0f0;
     border-bottom: 0;
+    font-size: 20px;
 }
 
 .mod-entry:last-child {
@@ -117,16 +132,22 @@ span.name-align {
 }
 
 body {
-    font-family: Consolas, monaco, monospace;
-    background-color: black;
+    font-family: Inter;
+    background-color: #16181c;
     color: #f0f0f0;
     max-width: 1000px;
     margin-left: 20px;
     margin-right: 20px;
 }
 
+hr {
+    border: 0px;
+    margin: 0px;
+    padding: 3px;
+}
+
 a {
-    color: #bb86fc;
+    color: var(--link);
 }
 
 #version {
@@ -147,8 +168,16 @@ a {
 }
 */
 
+summary>span:not(.name-align) {
+    font-size: 14px;
+}
+
+summary>* {
+    align-self: center;
+}
+
 input:is([type="checkbox"], [type="radio"])+label::before {
-    color: #bb86fc;
+    color: var(--checkbox);
     padding-bottom: 2px;
     white-space: nowrap;
 }
@@ -166,7 +195,7 @@ input[type="radio"]+label::before {
 }
 
 input[type="radio"]:checked+label::before {
-    content: "[x] ";
+    content: "[o] ";
 }
 
 input[type="checkbox"].auto-dependency+label::before {

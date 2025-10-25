@@ -142,9 +142,17 @@ function refreshMods(config) {
         const version = currVersionOf(mod, config.version)
         otherDiv.appendChild(createEntry(mod, version, mod.modid == "mcsrranked", obsoleteModids))
     }
+
+    if (config.version in specialVersions) {
+        document.querySelector("#af_text").classList.remove("hidden")
+        document.querySelector("#legal_text").classList.add("hidden")
+    } else {
+        document.querySelector("#af_text").classList.add("hidden")
+        document.querySelector("#legal_text").classList.remove("hidden")
+    }
 }
 
-function createEntry(mod, version, selectable, obsoleteMods, config) {
+function createEntry(mod, version, selectable, obsoleteMods) {
     const details = document.createElement("details")
     details.classList.add("mod-entry")
     const summary = document.createElement("summary")
@@ -180,13 +188,13 @@ function createEntry(mod, version, selectable, obsoleteMods, config) {
     const elements = []
     for (part of parts) {
         elements.push(document.createTextNode(part))
-        elements.push(document.createElement("br"))
+        elements.push(document.createElement("hr"))
     }
     elements.pop()
     description.prepend(
         document.createTextNode(mod.description),
         ...elements,
-        document.createElement("br"),
+        document.createElement("hr"),
         download,
         document.createTextNode(" "),
         homepage
@@ -594,6 +602,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (mod.modid == "mcsrranked") continue // ranked gets a checkbox
             const recommended = (mod["recommended"] ?? true) && (version["recommended"] ?? true)
             checkbox.checked = recommended
+            if (recommended) autoSelectDeps(mod.modid)
         }
         updateState()
     })
