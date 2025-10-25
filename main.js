@@ -30,7 +30,7 @@ specialVersions = {
 const topVersions = ["1.16.1", "1.15.2", "1.11.2", "1.8.9", "1.7.10", "1.16.5", "1.12.2", "1.8", "1.12", "20w14infinite"]
 
 function setVersionOptions() {
-    const datalist = document.querySelector("#versions")
+    const sellist = document.querySelector("#version-dropdown")
 
     for (const mod of legalMods) {
         for (const version of mod.versions) {
@@ -49,8 +49,8 @@ function setVersionOptions() {
 
     for (const version of topVersionsSort) {
         let option = new Option()
-        option.value = version
-        datalist.appendChild(option)
+        option.textContent = version
+        sellist.appendChild(option)
     }
 }
 
@@ -150,6 +150,15 @@ function refreshMods(config) {
         document.querySelector("#af_text").classList.add("hidden")
         document.querySelector("#legal_text").classList.remove("hidden")
     }
+
+    const versionText = [document.querySelector("#v1_14-"), document.querySelector("#v1_3-1_13"), document.querySelector("#v1_0-1_2")]
+    let idx
+    if (semverCompare("1.14-", config.version) >= 0) idx = 0
+    else if (semverCompare("1.3-", config.version) >= 0) idx = 1
+    else idx = 2
+
+    versionText.forEach(it => it.classList.add("hidden"))
+    versionText[idx].classList.remove("hidden")
 }
 
 function createEntry(mod, version, selectable, obsoleteMods) {
@@ -175,18 +184,18 @@ function createEntry(mod, version, selectable, obsoleteMods) {
     const download = document.createElement("a")
     download.href = version.url
     download.classList.add("button")
+    download.classList.add("button-link")
     download.setAttribute("download", "")
-    download.textContent = "[Download]"
+    download.textContent = "Download"
     const homepage = document.createElement("a")
     homepage.href = mod.homepage;
-    homepage.textContent = "[Homepage]";
-    if (mod.homepage.includes("frontcage.com")) homepage.textContent = "[Frontcage]";
-    else if (mod.homepage.includes("github.com")) homepage.textContent = "[GitHub]";
-    else if (mod.homepage.includes("modrinth.com")) homepage.textContent = "[Modrinth]";
+    homepage.classList.add("button")
+    homepage.classList.add("button-link")
+    homepage.textContent = "Homepage";
     summary.addEventListener("click", summaryOnClick)
     const parts = getIncompatibilityAndDependencyText(mod, version, obsoleteMods).split("\n")
     const elements = []
-    for (part of parts) {
+    for (const part of parts) {
         elements.push(document.createTextNode(part))
         elements.push(document.createElement("hr"))
     }
@@ -215,40 +224,40 @@ function nicelyJoin(elements) {
     return (data.length == 0 ? last : data.join(", ") + " and " + last)
 }
 
-const skipVersions = ["1.13.1", "1.12.1", "1.11.1", "1.11", "1.10.1", "1.10", "1.9.3", "1.9.2", "1.9.1", "1.9"]
-skipVersions.push(...Object.keys(specialVersions))
+// const skipVersions = ["1.13.1", "1.12.1", "1.11.1", "1.11", "1.10.1", "1.10", "1.9.3", "1.9.2", "1.9.1", "1.9"]
+// skipVersions.push(...Object.keys(specialVersions))
 
-function buildRanges(mod) {
-    const compatibleVersions = mod.versions.flatMap(it => it.target_version)
-    compatibleVersions.sort(semverCompare)
+// function buildRanges(mod) {
+//     const compatibleVersions = mod.versions.flatMap(it => it.target_version)
+//     compatibleVersions.sort(semverCompare)
 
-    const ranges = []
-    let range = 0
-    if (!versions.includes(compatibleVersions[0])) {
-        throw new Error("unrecoverable")
-    }
-    let i = 0
-    let j = versions.indexOf(compatibleVersions[0])
-    while (i < compatibleVersions.length && j < versions.length) {
-        if (!versions.includes(compatibleVersions[i]) || skipVersions.includes(compatibleVersions[i])) {
-            i++
-            continue
-        }
-        if (skipVersions.includes(versions[j])) {
-            j++
-            continue
-        }
-        if (compatibleVersions[i] == versions[j]) {
-            (ranges[range] ?? (ranges[range] = [])).push(compatibleVersions[i])
-            i++
-            j++
-        } else {
-            if (ranges[range] != undefined) range++
-            j++
-        }
-    }
-    return ranges.map(it => it.length == 1 ? it : it[0] + "-" + it.at(-1))
-}
+//     const ranges = []
+//     let range = 0
+//     if (!versions.includes(compatibleVersions[0])) {
+//         throw new Error("unrecoverable")
+//     }
+//     let i = 0
+//     let j = versions.indexOf(compatibleVersions[0])
+//     while (i < compatibleVersions.length && j < versions.length) {
+//         if (!versions.includes(compatibleVersions[i]) || skipVersions.includes(compatibleVersions[i])) {
+//             i++
+//             continue
+//         }
+//         if (skipVersions.includes(versions[j])) {
+//             j++
+//             continue
+//         }
+//         if (compatibleVersions[i] == versions[j]) {
+//             (ranges[range] ?? (ranges[range] = [])).push(compatibleVersions[i])
+//             i++
+//             j++
+//         } else {
+//             if (ranges[range] != undefined) range++
+//             j++
+//         }
+//     }
+//     return ranges.map(it => it.length == 1 ? it : it[0] + "-" + it.at(-1))
+// }
 
 function getIncompatibilityAndDependencyText(mod, version, obsoleteMods) {
     let res = ""
@@ -264,7 +273,9 @@ function getIncompatibilityAndDependencyText(mod, version, obsoleteMods) {
             .map(id => modFromModid(id).name)
         if (dependencies.length > 0) res += "\nDependent on " + nicelyJoin(dependencies)
     }
-    res += "\nAvailable for " + nicelyJoin(buildRanges(mod))
+    const extraLine = extraMetaLine(mod.modid)
+    if (extraLine) res += "\n" + extraLine
+    // res += "\nAvailable for " + nicelyJoin(buildRanges(mod))
     return res
 }
 
@@ -491,7 +502,8 @@ function getTitleText(incompatibilities, missingRequired, requiredBy, classes) {
  * @returns null if version is invalid, else object with fields version, macos, 
  */
 function getConfig() {
-    const currVersion = document.querySelector("#version").value
+    const dropdown = document.querySelector("#version-dropdown")
+    const currVersion = dropdown.value
     if (!versions.includes(currVersion)) return null
     return {
         version: currVersion,
@@ -509,7 +521,7 @@ function handleQueryParameters() {
     if (!Object.values(Category).includes(category)) category = Category.RANDOM_SEED
     const macos = params.has("macos") ? true : defaultMacOS
 
-    document.querySelector("#version").value = version
+    document.querySelector("#version-dropdown").value = version
     document.querySelector("#" + category).checked = true
     document.querySelector("#macos").checked = macos
 }
@@ -678,18 +690,18 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector("#optifine-warning").classList.add("hidden")
     })
 
-    document.querySelector("#show-more").addEventListener("click", e => {
-        e.target.parentElement.classList.add("hidden")
-        document.querySelector("#shown-more").classList.remove("hidden")
-    })
-
-    document.querySelector("#show-less").addEventListener("click", () => {
-        document.querySelector("#show-more").parentElement.classList.remove("hidden")
-        document.querySelector("#shown-more").classList.add("hidden")
-    })
-
     document.querySelector("#obsolete").addEventListener("click", e => setObsolete(e.target.checked))
 })
+
+function extraMetaLine(modid) {
+    switch (modid) {
+        case "extra-options": return "Abusing this mod, such as measuring Ender Eyes on soul sand, is banned. Please read A.8.12 of the full rules to see what abuses are banned."
+        case "chunkcacher":
+        case "setspawnmod": return "This mod is only allowed for Set Seed speedruns."
+        case "optifine": return "The default settings for OptiFine are not legal, and most extended options are banned. Please read A.8.1 of the full rules to fix the relevant settings. OptiFine is not allowed at all for glitched or oneshot runs."
+    }
+    return undefined
+}
 
 function selectedMods() {
     return checkboxes.filter(it => it.checked).map(checkbox => modidFromCheckbox(checkbox))
@@ -722,7 +734,7 @@ function generateModpack(config, loader, versions) {
             }
         })
     }
-    const zip = JSZip()
+    const zip = new JSZip()
     zip.file("modrinth.index.json", JSON.stringify(index))
     zip.generateAsync({ type: "blob" })
         .then(it => downloadBlob(it, id + ".mrpack", "application/x-modrinth-modpack+zip"))

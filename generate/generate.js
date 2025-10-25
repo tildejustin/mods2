@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }).then(it => setVersionOptions(it.mods))
 
     document.querySelector("#generate").addEventListener("click", () => {
-        const version = document.querySelector("#version").value
+        const version = document.querySelector("#version-dropdown").value
         if (!versions.includes(version)) return null
 
         fetch("https://meta.fabricmc.net/v2/versions/loader")
@@ -101,7 +101,7 @@ async function generateInstance(version, loader) {
 }
 
 function setVersionOptions(mods) {
-    const datalist = document.querySelector("#versions")
+    const datalist = document.querySelector("#version-dropdown")
 
     for (const mod of mods) {
         for (const version of mod.versions) {
@@ -117,7 +117,7 @@ function setVersionOptions(mods) {
 
     for (const version of versions) {
         let option = new Option()
-        option.value = version
+        option.textContent = version
         datalist.appendChild(option)
     }
 }

@@ -8,7 +8,6 @@
     <meta name="description" content="The official website for downloading mods allowed for Minecraft Speedrunning.">
     <meta name="keywords"
         content="MCSRMods, MCSR, mods, Fabric, Legacy Fabric, Ornithe, OrnitheMC, SRC, speedrun.com, allowed, legal, legalized, permitted">
-    <!-- this enough? :P -->
     <link rel="stylesheet" href="style.css">
     <script src="main.js"></script>
     <script src="dist/jszip.min.js"></script>
@@ -20,147 +19,133 @@
 <body>
     <h1>MCSR Mods List</h1>
     <br>
-    <p><a href="/">[Home]</a> | <a href="/generate">[Legacy Fabric Instance Generator]</a></p>
+    <p><a href="/">Home</a> | <a href="/generate">Legacy Fabric Instance Generator</a></p>
     <br>
-    <p>Before using any mods, please read over the overview of the rules below (press [Show more]). The complete rules
-        for mods can be found in section A.8 of the <a href="https://rules.minecraftspeedrunning.com/latest"
-            target="_blank" class="external-pdf">[full rules]</a>.
+    <p>
+        All other mods not explicitly allowed are banned for leaderboard speedruns, including Fabric API and MCSR
+        Ranked.
         <br><br>
-        <span>...<a class="button" id="show-more" tabindex="0">[Show more]</a></span>
+        Please use the most up to date version for mods. Mods are often made illegal, and using these mods results in
+        rejection. Please join the <a href="https://discord.com/invite/jmdFn3C">MCSR Discord server</a> to be informed
+        on when mod versions become illegal.
+        <br><br>
+        Only use the following launchers: The
+        <a href="https://www.minecraft.net/en-us/download">Vanilla launcher</a>,
+        <a href="https://github.com/MCSRLauncher/Launcher">MCSR Launcher</a> (recommended),
+        <a href="https://prismlauncher.org">Prism Launcher</a>,
+        <a href="https://https://multimc.org">MultiMC</a>,
+        <a href="https://modrinth.com/app">Modrinth App</a>, and
+        <a href="https://atlauncher.com">ATLauncher</a>.
+        <br><br>
+        For more information, read the complete rules for mods in section A.8 of the <a
+            href="https://rules.minecraftspeedrunning.com/latest" target="_blank" class="external-pdf">full rules</a>.
     </p>
-    <div class="hidden" id="shown-more">
-        Some mods are only allowed in set seed runs and will cause your run to be rejected if used in other
-        categories. Currently, these mods are Set Spawn and ChunkCacher. Legality warnings inside mods have the force of
-        law and must be followed. Currently, this includes Seedqueue's Show Debug Menu option and Set Spawn's message in
-        chat if incorrectly configured. If you choose to use Extra Options or Dynamic FOV off in OptiFine you are
-        required to follow A.8.12 of the full rules, which disallows certain abuses.
-        <br><br>
-        OptiFine is legal for 1.14.4 and below and only under very specific conditions. You must read A.8.1
-        of the full rules before using it as the <em><b>default settings are not legal</b></em>, and many other of its
-        other settings are banned. OptiFine is not allowed for glitched or oneshot runs.
-        <br><br>
-        All other mods not explicitly allowed are banned, with penalty of immediate run rejection. <b>This includes
-            Fabric API</b>, a library mod often used outside of MCSR. None of the allowed mods require Fabric API.
-        This also includes <a href="https://mcsrranked.com/">[MCSR Ranked]</a>, which is for playing head-to-head
-        matches, not leaderboard speedruns.
-        <br><br>
-        All mods use the <a href="http://https://fabricmc.net/">[Fabric Loader]</a>. Only a handful of launchers
-        verified to not significantly modify the game are currently allowed, these are: The
-        <a href="https://www.minecraft.net/en-us/download">[Vanilla launcher]</a>,
-        <a href="https://github.com/MCSRLauncher/Launcher">[MCSR Launcher]</a> (recommended),
-        <a href="https://prismlauncher.org">[Prism Launcher]</a>,
-        <a href="https://https://multimc.org">[MultiMC]</a>,
-        <a href="https://modrinth.com/app">[Modrinth App]</a>, and
-        <a href="https://atlauncher.com">[ATLauncher]</a>.
-        <!-- <ul>
-            <li><a href="https://www.minecraft.net/en-us/download">[Vanilla launcher]</a></li>
-            <li><a href="https://github.com/MCSRLauncher/Launcher">[MCSR Launcher]</a> (recommended)</li>
-            <li><a href="https://prismlauncher.org">[Prism Launcher]</a></li>
-            <li><a href="https://https://multimc.org">[MultiMC]</a></li>
-            <li><a href="https://modrinth.com/app">[Modrinth App]</a></li>
-            <li><a href="https://atlauncher.com">[ATLauncher]</a></li>
-        </ul> -->
-        <br><br>
-        Mods for versions 1.3 to 1.13.2 use Legacy Fabric. Currently the only legal way to install this is with
-        the MCSR Launcher or the MCSR-specific <a href="/generate">[MultiMC / Prism Launcher instances]</a>.
-        <b>DO NOT USE</b> the install methods from the Legacy Fabric project themselves as they modify game libaries.
-        Mods for versions 1.0.0 to 1.2.5 use OrnitheMC, with the same install options as Legacy Fabric.
-        Unfortunately, Modrinth modpacks currently do not support either.
-        <br><br>
-        Please note that previously legal builds of mods are often made illegal upon updates for closer vanilla parity
-        or bug fixes, DO NOT assume that just because the mods you have installed were legal at the time they are still
-        legal now. A grace period of a month to update mods is typically given for parity updates, this is often shorter
-        for bug fixes. When using mods you have a responsibility to ensure they are updated. Important changes should be
-        posted in <a href="https://speedrun.com/mc/news">[SRC news]</a> but we encourage you to join
-        the <a href="https://discord.com/invite/jmdFn3C">[MCSR Discord server]</a> (aka. Javacord) as
-        that is the most consistent way to get annoucements.
-        <br><br>
-        <a class="button" id="show-less" tabindex="0">[Show less]</a>
-        </p>
-    </div>
     <br>
     <div class="options">
         <div>
             <p>Game version</p>
             <div>
-                <input type="text" id="version" list="versions" class="updates-list">
-                <datalist id="versions"></datalist>
+                <select id="version-dropdown" class="version-style updates-list"></select>
+                <!-- <input type="text" id="version" list="versions" class="version-style updates-list hidden"> -->
+                <!-- <datalist id="versions"></datalist> -->
             </div>
         </div>
         <div>
             <p>Category</p>
             <div id="category-div">
                 <input type="radio" name="category" id="random_seed" class="updates-list hidden">
-                <label for="random_seed" tabindex="0"> Random Seed</label>
+                <label for="random_seed" tabindex="0">Random Seed</label>
                 <br>
                 <input type="radio" name="category" id="set_seed" class="updates-list hidden">
-                <label for="set_seed" tabindex="0"> Set Seed</label>
+                <label for="set_seed" tabindex="0">Set Seed</label>
             </div>
         </div>
         <div>
             <p>Operating system</p>
             <div id="os-div">
                 <input type="checkbox" id="macos" class="updates-list hidden">
-                <label for="macos" tabindex="0"> MacOS</label>
+                <label for="macos" tabindex="0">MacOS</label>
             </div>
         </div>
     </div>
-
+    <br>
+    <p id="v1_14-">
+        This version uses <a href="https://fabricmc.net">Fabric Loader</a>.
+    </p>
+    <p id="v1_3-1_13" class="hidden">
+        This version uses Legacy Fabric. You must install Legacy Fabric using the <a href="/generate">MultiMC / Prism
+            Launcher instances</a> or the MCSR Launcher. DO
+        NOT download from any other sources.
+        <br><br>
+        Modpacks are not supported for this version.
+    </p>
+    <p id="v1_0-1_2" class="hidden">
+        This version uses OrnitheMC. You must install Ornithe using the <a href="/generate">MultiMC / Prism Launcher
+            instances</a> or the MCSR Launcher. DO
+        NOT download from any other sources.
+        <br><br>
+        Modpacks are not supported for this version.
+    </p>
     <br>
     <div>
-        <a class="button" id="sel-recommended" tabindex="0">[Select recommended]</a>
-        <!-- needs a server-side zip creator, one day? ex. {version:"1.16.1", mods: ["voyager", "speedrunigt", "seedqueue"]} -->
-        <!-- <a class="button ms-show hidden" id="download-sel" tabindex="0">[Download selected]</a> -->
-        <a class="button ms-hide" id="start-sel" tabindex="0">[Start selection]</a>
-        <a class="button ms-show hidden" id="deselect-all" tabindex="0">[End selection]</a>
-        <a class="button ms-show hidden" id="mods-zip" tabindex="0">[Download zip]</a>
-        <a class="button ms-show hidden" id="modpack" tabindex="0">[Download modpack]</a>
-        <a class="button" id="ms-share" tabindex="0" title="Copies link to selected configuration to clipboard">[Share
-            configuration]</a>
+        <a class="button" id="sel-recommended" tabindex="0">Select recommended</a>
+        <a class="button ms-hide" id="start-sel" tabindex="0">Start selection</a>
+        <a class="button ms-show hidden" id="deselect-all" tabindex="0">End selection</a>
+        <a class="button ms-show hidden" id="mods-zip" tabindex="0">Download zip</a>
+        <a class="button ms-show hidden" id="modpack" tabindex="0">Download modpack</a>
+        <a class="button" id="ms-share" tabindex="0" title="Copies link to selected configuration to clipboard">Share
+            configuration</a>
     </div>
     <br>
     <div id="mods">
-        <h3>Legal Mods</h3>
-        <p id="legal_text">Mods allowed for use on <a href="http://speedrun.com/mc">[speedrun.com/mc]</a> and <a
-                href="http://speedrun.com/mcce">[speedrun.com/mcce]</a>.</p>
+        <h2>Legal Mods</h2>
+        <p id="legal_text">Mods allowed for use on <a href="http://speedrun.com/mc">speedrun.com/mc</a> and <a
+                href="http://speedrun.com/mcce">speedrun.com/mcce</a>.</p>
         <p class="hidden" id="af_text">Mods allowed for use on <a
-                href="http://speedrun.com/mc_af">[speedrun.com/mc_af]</a>.</p>
+                href="http://speedrun.com/mc_af">speedrun.com/mc_af</a>.</p>
         <div id="legal">
             <details class="mod-entry hide-arrow" id="warnings">
                 <summary>This site requires JavaScript. Welcome to the 21st century.</summary>
             </details>
         </div>
         <br>
-        <h3 hidden class="other-text">Other Mods</h3>
+        <h2 hidden class="other-text">Other Mods</h2>
         <p hidden class="other-text">Mods that are relavent to MCSR, such as practice mods or mods for
-            modded categories. <em>Not legal for board submissions!</em></p>
+            modded categories. Not legal for main board submissions!</p>
         <div id="other"></div>
         <div class="hidden" id="accessibility-warning">
             <p>Accessibility Mods Warning:</p>
             <br>
-            <p>There are rules associated with the use of accessibilty mods that you must be aware of before using them.
-                Please read rule A.8.12 of the full rules.</p>
+            <p>
+                Abusing this mod, such as measuring Ender Eyes on soul sand, is banned. Please read A.8.12 of the full
+                rules to see what abuses are banned.
+            </p>
             <br>
-            <a href="https://rules.minecraftspeedrunning.com/latest" target="_blank" class="external-pdf">[Full
-                rules]</a> <a class="button closer">[Close]</a>
+            <a href="https://rules.minecraftspeedrunning.com/latest" target="_blank"
+                class="external-pdf button button-link">Full
+                rules</a> <a class="button closer">Close</a>
         </div>
         <div class="hidden" id="optifine-warning">
             <p>OptiFine Warning:</p>
             <br>
-            <p>There are strict rules associated with the use of OptiFine that you must be aware of before using the
-                mod.
-                Please read rule A.8.1 of the full rules.</p>
+            <p>
+                The default settings for OptiFine are not legal, and most extended options are banned. Please read A.8.1
+                of the full rules to fix the relevant settings. OptiFine is not allowed at all for glitched or oneshot
+                runs.
+            </p>
             <br>
-            <a href="https://rules.minecraftspeedrunning.com/latest" target="_blank" class="external-pdf">[Full
-                rules]</a> <a class="button closer">[Close]</a>
+            <a href="https://rules.minecraftspeedrunning.com/latest" target="_blank"
+                class="external-pdf button button-link">Full
+                rules</a> <a class="button closer">Close</a>
         </div>
     </div>
     <br>
     <p>
         Tips and tricks:<br>
-        Hover over the version to see the Mod ID.<br>
+        Ctrl + click on a mod to enable multi-select.<br>
         Ctrl + click on an incompatible mod to select it anyway.<br>
         Ctrl + click on a manually selected auto-selected mod to deselect it anyway.<br>
+        Hover over the version to see the Mod ID.<br>
         Toggle obsolete mods: <input type="checkbox" id="obsolete" class="hidden"><label for="obsolete"></label><br>
         <br>
         Source code at <a

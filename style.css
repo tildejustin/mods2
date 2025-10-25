@@ -25,9 +25,22 @@ ul {
 }
 
 a.button {
-    background: none;
     cursor: pointer;
     text-decoration: none;
+    background: rgb(55, 50, 98);
+    padding: 5px 7px 5px 7px;
+    color: snow;
+    display: inline-block;
+    margin: 5px;
+    margin-left: 0;
+}
+
+a.button-link {
+    text-decoration: none;
+}
+
+a.button-link:hover {
+    text-decoration: underline;
 }
 
 .options {
@@ -53,7 +66,7 @@ a.button {
     position: relative;
 }
 
-#mods>h3 {
+#mods>h2 {
     margin: 0;
     padding: 0;
 }
@@ -73,7 +86,7 @@ summary {
 }
 
 [open]:not(.hide-arrow) summary {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid snow;
 }
 
 :root {
@@ -81,6 +94,7 @@ summary {
     --link: rgb(79, 156, 255);
     /* --link: #bb86fc; */
     --checkbox: #bb86fc;
+    --background: #16181c;
 }
 
 summary::before {
@@ -114,27 +128,27 @@ input+label::before {
 
 .mod-entry p {
     /* yikes */
-    padding: 5px;
-    padding-left: 8px;
-    padding-bottom: 7px;
+    padding: 10px;
+    padding-top: 8px;
+    padding-left: 22px;
     font-size: 16px;
 }
 
 .mod-entry {
     max-width: 800px;
-    border: 1px solid #f0f0f0;
+    border: 1px solid snow;
     border-bottom: 0;
-    font-size: 20px;
+    font-size: 18px;
 }
 
 .mod-entry:last-child {
-    border: 1px solid #f0f0f0;
+    border: 1px solid snow;
 }
 
 body {
     font-family: Inter;
-    background-color: #16181c;
-    color: #f0f0f0;
+    background-color: var(--background);
+    color: snow;
     max-width: 1000px;
     margin-left: 20px;
     margin-right: 20px;
@@ -150,24 +164,6 @@ a {
     color: var(--link);
 }
 
-#version {
-    background: inherit;
-    font: inherit;
-    border: 1px solid white;
-    color: inherit;
-    padding: 3px;
-    width: 95%;
-    max-width: 130px;
-    box-sizing: border-box;
-}
-
-/* 
-#version:active, #version:focus {
-    outline-style: solid;
-    outline-color: #bb86fc;
-}
-*/
-
 summary>span:not(.name-align) {
     font-size: 14px;
 }
@@ -182,6 +178,10 @@ input:is([type="checkbox"], [type="radio"])+label::before {
     white-space: nowrap;
 }
 
+.options input:is([type="checkbox"], [type="radio"])+label::before {
+    padding-right: 10px;
+}
+
 input[type="checkbox"]+label::before {
     content: "[ ]";
 }
@@ -191,11 +191,11 @@ input[type="checkbox"]:checked+label::before {
 }
 
 input[type="radio"]+label::before {
-    content: "[ ] ";
+    content: "[ ]";
 }
 
 input[type="radio"]:checked+label::before {
-    content: "[o] ";
+    content: "[o]";
 }
 
 input[type="checkbox"].auto-dependency+label::before {
@@ -220,7 +220,7 @@ input[type="checkbox"].override-incompatible+label::before {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .hide-arrow>summary::before {
@@ -231,8 +231,8 @@ input[type="checkbox"].override-incompatible+label::before {
 #optifine-warning {
     position: absolute;
     top: 300px;
-    border: 1px solid #f0f0f0;
-    background-color: black;
+    border: 1px solid snow;
+    background-color: var(--background);
     left: 35px;
     right: 35px;
     top: 25%;
@@ -244,4 +244,13 @@ input[type="checkbox"].override-incompatible+label::before {
 .disabled {
     color: grey;
     pointer-events: none;
+}
+
+#version-dropdown {
+    border: 1px solid snow;
+    max-width: 130px;
+    width: 95%;
+    color: snow;
+    background-color: var(--background);
+    padding: 5px;
 }
