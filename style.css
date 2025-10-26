@@ -242,7 +242,7 @@ input[type="checkbox"].override-incompatible+label::before {
 }
 
 .disabled {
-    color: grey;
+    color: grey !important;
     pointer-events: none;
 }
 
