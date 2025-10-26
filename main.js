@@ -44,8 +44,9 @@ function setVersionOptions() {
 
     versions.sort(semverCompare)
 
-    const topVersionsSort = versions.filter(version => !topVersions.includes(version))
+    const topVersionsSort = versions.filter(version => !topVersions.includes(version) && version != "1.13.2")
     topVersionsSort.unshift(...topVersions)
+    topVersionsSort.push("1.13.2")
 
     for (const version of topVersionsSort) {
         let option = new Option()
