@@ -253,4 +253,5 @@ input[type="checkbox"].override-incompatible+label::before {
     color: snow;
     background-color: var(--background);
     padding: 5px;
+    border-radius: 3px;
 }
