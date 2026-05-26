@@ -1,3 +1,10 @@
 todo.md
 zip-creator/.wrangler/
 zip-creator/node_modules/
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
