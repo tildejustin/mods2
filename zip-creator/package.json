@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "wrangler": "^4.44.0"
+    "wrangler": "^4.95.0"
   },
   "dependencies": {
     "jszip": "^3.10.1"
