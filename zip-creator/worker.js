@@ -8,8 +8,15 @@ export default {
         const errorHeaders = {
             "Vary": "Origin"
         }
+        const allowedOrigins = [
+            "mc.sr",
+            "tildejustin.dev",
+            "minecraftspeedrunning.com",
+            "127.0.0.1:8000"
+        ]
         const errorResponse = new Response("Invalid query", { status: 400, headers: errorHeaders })
-        if (origin == null || (!origin.endsWith("tildejustin.dev") && !origin.endsWith("minecraftspeedrunning.com"))) {
+        console.log(origin)
+        if (origin == null || !allowedOrigins.find(it => origin.endsWith(it))) {
             return errorResponse
         }
         errorHeaders["Access-Control-Allow-Origin"] = origin
@@ -59,8 +66,7 @@ async function getMods(version, mods) {
         return response.json()
     }))).then(([legal, other]) => {
         const modVersions = []
-        legal.mods.push(other.mods.find(it => it.modid == "mcsrranked"))
-        for (const mod of legal.mods) {
+        for (const mod of [...legal.mods, ...other.mods]) {
             if (!mods.includes(mod.modid)) continue
             const modVersion = mod.versions.find(it => it.target_version.includes(version))
             if (modVersion == undefined) continue

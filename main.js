@@ -123,7 +123,6 @@ function refreshMods(config) {
     const ranked = currOtherMods.find(it => it.modid == "mcsrranked")
     if (ranked) {
         const idx = currOtherMods.indexOf(ranked)
-        // no remove method, what a stdlib it is. and why does splice work like this instead of start, end???
         currOtherMods.splice(idx, 1)
         currOtherMods.unshift(ranked)
     }
@@ -133,7 +132,7 @@ function refreshMods(config) {
     legalDiv.replaceChildren()
     for (const mod of currLegalMods) {
         version = currVersionOf(mod, config.version)
-        legalDiv.appendChild(createEntry(mod, version, true, obsoleteModids))
+        legalDiv.appendChild(createEntry(mod, version, obsoleteModids))
     }
 
     const otherDiv = document.querySelector("#other")
@@ -141,7 +140,7 @@ function refreshMods(config) {
     document.querySelectorAll(".other-text").forEach(it => it.hidden = currOtherMods.length == 0)
     for (const mod of currOtherMods) {
         const version = currVersionOf(mod, config.version)
-        otherDiv.appendChild(createEntry(mod, version, mod.modid == "mcsrranked", obsoleteModids))
+        otherDiv.appendChild(createEntry(mod, version, obsoleteModids))
     }
 
     if (config.version in specialVersions) {
@@ -162,21 +161,18 @@ function refreshMods(config) {
     versionText[idx].classList.remove("hidden")
 }
 
-function createEntry(mod, version, selectable, obsoleteMods) {
+function createEntry(mod, version, obsoleteMods) {
     const details = document.createElement("details")
     details.classList.add("mod-entry")
     const summary = document.createElement("summary")
-    if (selectable) {
-        summary.classList.add("legal-listing")
-        // scope shenanigans
-        var checkbox = document.createElement("input")
-        checkbox.type = "checkbox"
-        checkbox.classList.add("ms-checkbox", "hidden")
-        checkbox.id = "ms-checkbox-" + mod.modid
-        label = document.createElement("label")
-        label.classList.add("hidden", "ms-checkbox-label")
-        label.htmlFor = checkbox.id
-    }
+    summary.classList.add("legal-listing")
+    var checkbox = document.createElement("input")
+    checkbox.type = "checkbox"
+    checkbox.classList.add("ms-checkbox", "hidden")
+    checkbox.id = "ms-checkbox-" + mod.modid
+    label = document.createElement("label")
+    label.classList.add("hidden", "ms-checkbox-label")
+    label.htmlFor = checkbox.id
     const modName = document.createElement("span")
     modName.classList.add("name-align")
     const versionSpan = document.createElement("span")
@@ -212,10 +208,9 @@ function createEntry(mod, version, selectable, obsoleteMods) {
     modName.prepend(document.createTextNode(mod.name))
     versionSpan.prepend(document.createTextNode("v" + version.version))
     summary.prepend(modName, versionSpan)
-    if (selectable) summary.prepend(checkbox, label)
+    summary.prepend(checkbox, label)
     details.prepend(summary, description)
-
-    if (selectable) checkboxes.push(checkbox)
+    checkboxes.push(checkbox)
     return details
 }
 
@@ -382,7 +377,6 @@ function getDependencies(modid) {
 
 function updateState() {
     // there's a good chance there's a lot of bugs in this method
-
     let anyRemoved
     let missingRequired
     let requiredBy
@@ -444,7 +438,7 @@ function updateState() {
         deps.unshift(modid)
         for (const depModid of deps) {
             const mod = modFromModid(depModid)
-            if (mod.incompatibilities == undefined) continue
+            if (mod == undefined || mod.incompatibilities == undefined) continue
             for (const other of mod.incompatibilities) {
                 const otherMod = checkboxFromModid(other)
                 if (otherMod == undefined) continue
@@ -612,7 +606,7 @@ document.addEventListener("DOMContentLoaded", () => {
         for (const checkbox of checkboxes) {
             const mod = modFromCheckbox(checkbox)
             const version = modVersionFromCheckbox(checkbox, currConfig.version)
-            if (mod.modid == "mcsrranked") continue // ranked gets a checkbox
+            if (checkbox.closest("div").id != "legal") continue
             const recommended = (mod["recommended"] ?? true) && (version["recommended"] ?? true)
             checkbox.checked = recommended
             if (recommended) autoSelectDeps(mod.modid)
@@ -749,7 +743,6 @@ function downloadBlob(blob, name, mime) {
     tempLink.type = mime
     tempLink.click()
     URL.revokeObjectURL(blobUrl)
-
 }
 
 function enableMultiSelect() {
