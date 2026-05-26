@@ -608,8 +608,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const version = modVersionFromCheckbox(checkbox, currConfig.version)
             if (checkbox.closest("div").id != "legal") continue
             const recommended = (mod["recommended"] ?? true) && (version["recommended"] ?? true)
-            checkbox.checked = recommended
-            if (recommended) autoSelectDeps(mod.modid)
+            if (recommended) checkbox.parentElement.click()
         }
         updateState()
     })
